@@ -4,12 +4,12 @@
     "description": "Krzysztof Furtak's home page",
     "private": "true",
     "devDependencies": {
-        "gulp": "^4.0.2",
+        "del": "^5.1.0",
+        "gulp": "^3.9.1",
         "gulp-cli": "^2.2.0",
-        "gulp-htmlmin": "^5.0.1",
         "gulp-csso": "^3.0.1",
-        "gulp-tar": "^3.0.1",
         "gulp-gzip": "^1.4.2",
-        "del": "^5.1.0"
+        "gulp-htmlmin": "^5.0.1",
+        "gulp-tar": "^2.1.0"
     }
 }
