@@ -1,11 +1,20 @@
 /*-----------------------------------------------------------------------------
+ Global
+-----------------------------------------------------------------------------*/
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -.125em;
+  fill: #ffffff;
+}
+
+/*-----------------------------------------------------------------------------
  Header
 -----------------------------------------------------------------------------*/
 #header {
   transition: all 0.5s;
-  background: #000000;
+  background: rgba(0,0,0,0.5);
   z-index: 997;
-  padding: 8px 8px;
 }
 #header .logo {
   font-size: 20px;
@@ -20,6 +29,7 @@
 }
 #header a {
   text-decoration: none;
+  text-transform: uppercase;
   color: #ffffff;
 }
 #header .highlight {
@@ -28,7 +38,7 @@
 }
 #header .logo img {
   border-radius: 50%;
-  max-height: 40px;
+  max-height: 30px;
   vertical-align: middle;
   margin-right: .5rem;
 }
@@ -59,8 +69,22 @@
 }
 
 /*-----------------------------------------------------------------------------
+ Footer
+-----------------------------------------------------------------------------*/
+#footer{
+  margin-top: auto;
+}
+#footer .copyright p {
+  text-align: center;
+}
+
+/*-----------------------------------------------------------------------------
  Navigation Menu
 -----------------------------------------------------------------------------*/
+#fp-nav ul li a span{
+  background: #ffffff;
+}
+
 /* TODO: Clean up navigation menu styles! */
 #navbar {
   position: relative;
@@ -68,8 +92,9 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  text-transform: uppercase;
 }
 #navbar ul {
   margin: 0;
@@ -84,15 +109,13 @@
   font-size: 20px;
   font-family: "Roboto Condensed";
 }
+#nav-menu a.nav-menu-item {
+  padding-left: 2px;
+  padding-right: 2px;
+}
 #nav-menu li.active a {
   color: #000000;
   background-color: #ffffff;
-}
-.navbar .brand-icon {
-  width: 1em;
-  height: 1em;
-  vertical-align: -.125em;
-  fill: #ffffff;
 }
 @media (max-width: 1366px) {
   .navbar .dropdown .dropdown ul {
@@ -114,13 +137,19 @@
 .section h1 {
   color: #ffffff;
   font-family: 'Orbitron', sans-serif;
-  font-size: 48px;
+  font-size: 4rem;
   font-weight: 90;
-  margin-top: .5rem;
-  margin-bottom: .5rem;
+  margin-bottom: 1em;
+  text-transform: uppercase;
+}
+.section h2 {
+  color: #ffffff;
+  font-size: 2.25rem;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 .section h3 {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -154,12 +183,21 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+#section-intro h1 {
+  font-size: 48px;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  text-transform: none;  
+}
+#section-intro h3 {
+  font-size: 1.75rem;  
+}
 
 /*-----------------------------------------------------------------------------
  About section
 -----------------------------------------------------------------------------*/
 #section-about {
-  background-color: #e0e0e0;
+  background-color: #222629;
 }
 
 /*-----------------------------------------------------------------------------
@@ -173,5 +211,69 @@
  Contact section
 -----------------------------------------------------------------------------*/
 #section-contact {
+  background-color: #222629;
+}
+#section-contact .section-container {
+  margin-top: auto;
+}
+#section-contact .paragraph {
+  margin-bottom: 20px;
+}
+
+/*-----------------------------------------------------------------------------
+ Buttons
+-----------------------------------------------------------------------------*/
+.button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  display: flex;
+  width: max-content;
+  color: #ffffff;
+  font-size: 20px;
+  font-family: "Roboto Condensed";
+  text-decoration: none;
+}
+.button-icon {
+  padding: 8px;
+}
+.button-label {
+  padding: 8px;
+}
+.button-icon-email {
+  background-color: #424242;
+}
+.button-label-email {
+  background-color: #5b5b5b;
+}
+.email-visible > .button-icon-email {
+  background-color: #d33b30;
+}
+.email-visible > .button-label-email {
+  background-color: #ea4335;
+}
+.button-icon-linkedin {
+  background-color: #149bcc;
+}
+.button-label-linkedin {
+  background-color: #15ace5;
+}
+.button-icon-send-message {
+  background-color: #78aa2c;
+}
+.button-label-send-message {
   background-color: #86c232;
+}
+.button-icon-itch {
+  background-color: #e25353;
+}
+.button-label-itch {
+  background-color: #fa5c5c;
+}
+.button-icon-github {
+  background-color: #000000;
+}
+.button-label-github {
+  color: #000000;
+  background-color: #ffffff;
 }
