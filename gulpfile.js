@@ -7,7 +7,7 @@ const del = require('del');
 const rename = require("gulp-rename");
 const htmlmin = require('gulp-htmlmin');
 const cleanCSS = require('gulp-clean-css');
-const uglify = require('gulp-uglify');
+const minify = require('gulp-minify');
 
 
 task('clean', function () {
@@ -17,8 +17,12 @@ task('clean', function () {
 task('javascript', function () {
   return merge(
     src('./src/js/*.js')
-      .pipe(uglify())
-      .pipe(rename({ suffix: '.min' }))
+      .pipe(minify({
+        ext: {
+          min: '.min.js'
+        },
+        noSource: true
+      }))
       .pipe(dest('./dist/js/')),
     src('./node_modules/fullpage.js/dist/fullpage.min.js')
       .pipe(dest('./dist/js/'))
