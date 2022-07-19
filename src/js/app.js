@@ -45,12 +45,19 @@
       }
 
       e.preventDefault();
-      let email = atob('Y29udGFjdEBrcnp5c3p0b2ZmdXJ0YWsuZGV2Cg==')
+
       let link = select('#email-button')
-      select('#email').textContent = email
-      link.href = 'mailto:' + email
-      link.classList.add('email-visible')
-      emailDisplayed = true
+      var email = 'MY_EMAIL_BASE64'
+      try {
+        email = atob(email)
+      } catch (error) {
+        // Just ignore
+      } finally {
+        select('#email').textContent = email
+        link.href = 'mailto:' + email
+        link.classList.add('email-visible')
+        emailDisplayed = true
+      }
     }
   }
 
