@@ -18,49 +18,13 @@
 }
 
 /*-----------------------------------------------------------------------------
- Container
------------------------------------------------------------------------------*/
-.container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-.flex-container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-@media (min-width: 992px) {
-  .container, .flex-container {
-    max-width: 960px;
-  }
-}
-@media (min-width: 1200px) {
-  .container, .flex-container {
-    max-width: 1140px;
-  }
-}
-@media (min-width: 1400px) {
-  .container, .flex-container {
-    max-width: 1320px;
-  }
-}
-
-/*-----------------------------------------------------------------------------
  Header
 -----------------------------------------------------------------------------*/
 #header {
   font-size: 20px;
   font-family: "Roboto Condensed";
   font-weight: 300;
-  background: rgba(0, 0, 0, 0.5);
+  background: #000000;
   z-index: 997;  
   padding-left: 6px;
   padding-right: 6px;
@@ -197,6 +161,13 @@
 }
 #fp-nav ul li a span {
   background-color: #ffffff;
+  transition: background 1s;
+}
+.fp-viewing-1 #fp-nav ul li a span {
+  background-color: #000000;
+}
+.fp-viewing-1 #fp-nav ul li .fp-tooltip {
+  color: #000000
 }
 
 /*-----------------------------------------------------------------------------
@@ -206,6 +177,7 @@
   margin-top: auto;
 }
 #footer .copyright p {
+  font-size: 1em;
   text-align: center;
 }
 
@@ -220,52 +192,94 @@
 .section h1 {
   color: #ffffff;
   font-family: 'Orbitron', sans-serif;
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 90;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
   text-transform: uppercase;
 }
 .section h2 {
   color: #ffffff;
   font-size: 2.25rem;
   margin-top: 0;
-  margin-bottom: 24px;
+  margin-bottom: 1.5em;
 }
-.section h3 {
+.section p {
   font-size: 1.5rem;
+  color: #666666;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: 0.75em;
 }
-.section h5 {
+.section strong {
+  color: #86c232;
+  font-size: 2.25rem;
+}
+.section small {
   font-size: 1.25rem;
   margin-top: 0;
   margin-bottom: 0;
 }
-.section .highlight {
-  color: #86c232;
+.section blockquote {
   font-size: 2.25rem;
+  margin-top: 0;
+  margin-bottom: 1.5em;
+}
+.section cite {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.section .night-begins-to-shine {
+  background: -webkit-linear-gradient(left, #fc40ff, #543fff); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent;  
+}
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.flex-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+@media (min-width: 992px) {
+  .container, .flex-container {
+    max-width: 960px;
+  }
+}
+@media (min-width: 1200px) {
+  .container, .flex-container {
+    max-width: 1140px;
+  }
+}
+@media (min-width: 1400px) {
+  .container, .flex-container {
+    max-width: 1320px;
+  }
 }
 
 /*-----------------------------------------------------------------------------
  Intro section
 -----------------------------------------------------------------------------*/
 #section-intro {
-  background-image: url('../images/intro.jpg');
+  background-image: url('../images/intro_background.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 #section-intro h1 {
-  font-size: 48px;
   margin-top: .5rem;
-  margin-bottom: .5rem;
-  text-transform: none;  
-}
-#section-intro h3 {
-  font-size: 1.75rem;  
+  text-transform: none;
 }
 #section-intro .container {
-  width: 100%;
   margin-left: auto;
   margin-right: auto;
   margin-top: auto;
@@ -283,7 +297,18 @@
  Projects section
 -----------------------------------------------------------------------------*/
 #section-projects {
-  background-color: #222629;
+  background-color: #e0e0e0;
+  background: url('../images/projects_background.png') repeat
+  /*color: #000000;*/
+}
+#section-projects h1 {
+  color: #000000;
+}
+#section-projects h2 {
+  color: #000000;
+}
+#section-projects p {
+  color: #000000;
 }
 
 /*-----------------------------------------------------------------------------
@@ -291,12 +316,6 @@
 -----------------------------------------------------------------------------*/
 #section-contact {
   background-color: #222629;
-}
-#section-contact .section-container {
-  margin-top: auto;
-}
-#section-contact .paragraph {
-  margin-bottom: 20px;
 }
 
 /*-----------------------------------------------------------------------------
@@ -354,5 +373,5 @@
 }
 .button-label-github {
   color: #000000;
-  background-color: #ffffff;
+  background-color: #e0e0e0;
 }

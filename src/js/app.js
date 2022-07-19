@@ -70,7 +70,7 @@
     slidesNavigation: true,
     navigation: true,
     navigationPosition: 'right',
-    navigationTooltips: ['HOME', 'CONTACT'],
+    navigationTooltips: ['HOME', 'PROJECTS', 'CONTACT'],
     onLeave: function(origin, destination, direction) {
       toggleNavItem(origin.index)
       toggleNavItem(destination.index)
@@ -87,10 +87,14 @@
             function(e) {
               e.preventDefault()
               fullpage_api.moveTo(index + 1)
+              if (select('#navbar').classList.contains('navbar-mobile')) {
+                toggleMobileMenu()
+              }
             })
         })
       toggleNavItem(0)
     }
   })
 
+  select('#copyright-year').textContent = new Date().getFullYear().toString()
 })()
