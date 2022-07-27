@@ -1,11 +1,20 @@
 /*-----------------------------------------------------------------------------
  Global
 -----------------------------------------------------------------------------*/
+:root {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-light-green: #86c232;
+  --color-grey: #8c8c8c;
+  --color-dark-grey: #222629;
+  --color-almost-white: #e0e0e0;
+}
+
 .icon {
   width: 1em;
   height: 1em;
   vertical-align: -.125em;
-  fill: #ffffff;
+  fill: var(--color-white);
 }
 .hidden {
   display: none !important;
@@ -23,13 +32,10 @@
 #header {
   font-size: 20px;
   font-family: "Roboto Condensed";
-  font-weight: 300;
-  background: #000000;
-  z-index: 997;  
+  font-weight: 700;
+  background: var(--color-black);
   padding-left: 6px;
   padding-right: 6px;
-  padding-top: 4px;
-  padding-bottom: 4px;
 }
 #header .container {
   margin-left: auto;
@@ -43,16 +49,17 @@
 }
 #header .highlight {
   padding-left: 2px;
-  color: #86c232;
+  color: var(--color-light-green);
 }
 #header .logo {
   display: flex;
   align-items: center;
-  margin: 0;
+  color: var(--color-white);
+  margin-top: 4px;
+  margin-bottom: 4px;
   padding: 0;
   line-height: 1;
   letter-spacing: -1px;
-  color: #ffffff;
 }
 #header .logo img {
   border-radius: 50%;
@@ -85,11 +92,7 @@
 }
 .navbar a {
   white-space: nowrap;
-  color: #ffffff;
-}
-.navbar a.nav-menu-item {
-  padding-left: 2px;
-  padding-right: 2px;
+  color: var(--color-white);
 }
 .navbar ul {
   margin: 0;
@@ -100,17 +103,24 @@
 }
 .navbar li {
   position: relative;
-  padding-left: 7px;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  line-height: 38px;
+}
+.navbar li.active {
+  background-color: var(--color-white);
 }
 .navbar li.active a {
-  color: #000000;
-  background-color: #ffffff;
+  color: var(--color-black);
 }
 .mobile-nav-toggle {
   cursor: pointer;
   display: none;
   line-height: 0;
 }
+
 /* Mobile navigation  */
 @media (max-width: 991px) {
   .mobile-nav-toggle {
@@ -132,7 +142,7 @@
   width: 100%;
   height: 100%;
   font-size: 40px;
-  background-color: #86c232;
+  background-color: var(--color-light-green);
   z-index: 999;
 }
 .navbar-mobile .mobile-nav-toggle {
@@ -149,9 +159,11 @@
 .navbar-mobile li {
   line-height: 2;
 }
-.navbar-mobile li.active a {
-  color: #ffffff;
+.navbar-mobile li.active {
   background-color: transparent;
+}
+.navbar-mobile li.active a {
+  color: var(--color-white);
 }
 .navbar-mobile .nav-menu-social {
   margin-left: auto;
@@ -160,14 +172,14 @@
   margin-bottom: 15px;
 }
 #fp-nav ul li a span {
-  background-color: #ffffff;
+  background-color: var(--color-white);
   transition: background 1s;
 }
 .fp-viewing-1 #fp-nav ul li a span {
-  background-color: #000000;
+  background-color: var(--color-black);
 }
 .fp-viewing-1 #fp-nav ul li .fp-tooltip {
-  color: #000000
+  color: var(--color-black);
 }
 
 /*-----------------------------------------------------------------------------
@@ -187,10 +199,12 @@
 .section {
   text-align: left;
   font-family: "Roboto Condensed";
-  color: #666666;
+  color: var(--color-grey);
+  padding-left: 8px;
+  padding-right: 42px;
 }
 .section h1 {
-  color: #ffffff;
+  color: var(--color-white);
   font-family: 'Orbitron', sans-serif;
   font-size: 3rem;
   font-weight: 90;
@@ -198,20 +212,22 @@
   text-transform: uppercase;
 }
 .section h2 {
-  color: #ffffff;
+  color: var(--color-white);
   font-size: 2.25rem;
   margin-top: 0;
   margin-bottom: 1.5em;
 }
 .section p {
+  font-weight: 400;
   font-size: 1.5rem;
-  color: #666666;
+  color: var(--color-grey);
   margin-top: 0;
   margin-bottom: 0.75em;
 }
 .section strong {
-  color: #86c232;
   font-size: 2.25rem;
+  white-space: nowrap;
+  color: var(--color-light-green);
 }
 .section small {
   font-size: 1.25rem;
@@ -219,19 +235,24 @@
   margin-bottom: 0;
 }
 .section blockquote {
-  font-size: 2.25rem;
+  font-size: 1.75rem;
+  font-style: italic;
+  color: var(--color-light-green);
   margin-top: 0;
   margin-bottom: 1.5em;
 }
 .section cite {
   font-size: 1rem;
+  font-style: normal;
+  color: var(--color-black);
   margin-top: 0;
   margin-bottom: 0;
 }
 .section .night-begins-to-shine {
+  white-space: nowrap;
   background: -webkit-linear-gradient(left, #fc40ff, #543fff); 
   -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent;  
+  -webkit-text-fill-color: transparent;
 }
 .container {
   width: 100%;
@@ -290,47 +311,46 @@
  About section
 -----------------------------------------------------------------------------*/
 #section-about {
-  background-color: #222629;
+  background-color: var(--color-dark-grey);
 }
 
 /*-----------------------------------------------------------------------------
  Projects section
 -----------------------------------------------------------------------------*/
 #section-projects {
-  background-color: #e0e0e0;
+  background-color: var(--color-almost-white);
   background: url('../images/projects_background.png') repeat
-  /*color: #000000;*/
 }
 #section-projects h1 {
-  color: #000000;
+  color: var(--color-black);
 }
 #section-projects h2 {
-  color: #000000;
+  color: var(--color-black);
 }
 #section-projects p {
-  color: #000000;
+  color: var(--color-black);
 }
 
 /*-----------------------------------------------------------------------------
  Contact section
 -----------------------------------------------------------------------------*/
 #section-contact {
-  background-color: #222629;
+  background-color: var(--color-dark-grey);
 }
 
 /*-----------------------------------------------------------------------------
  Buttons
 -----------------------------------------------------------------------------*/
 .button {
-  margin-top: 10px;
-  margin-bottom: 10px;
   position: relative;
   display: flex;
   width: max-content;
-  color: #ffffff;
   font-size: 20px;
   font-family: "Roboto Condensed";
   text-decoration: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: var(--color-white);
 }
 .button-icon {
   padding: 8px;
@@ -360,7 +380,7 @@
   background-color: #78aa2c;
 }
 .button-label-send-message {
-  background-color: #86c232;
+  background-color: var(--color-light-green);
 }
 .button-icon-itch {
   background-color: #e25353;
@@ -369,9 +389,9 @@
   background-color: #fa5c5c;
 }
 .button-icon-github {
-  background-color: #000000;
+  background-color: var(--color-black);
 }
 .button-label-github {
-  color: #000000;
-  background-color: #e0e0e0;
+  color: var(--color-black);
+  background-color: var(--color-almost-white);
 }
