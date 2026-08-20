@@ -32,6 +32,10 @@ export default defineConfig({
   webServer: {
     command: `npm run preview -- --port=${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI
+    // Never reuse a server that happens to be on the port: it would very likely
+    // be serving an older dist/ than the one just built, so the suite would
+    // silently test stale output. Combined with --strictPort, a leftover
+    // `npm run preview` now fails the run loudly instead of corrupting it.
+    reuseExistingServer: false
   }
 });

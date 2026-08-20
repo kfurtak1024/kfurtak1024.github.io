@@ -11,7 +11,8 @@ const DIST = join(ROOT, 'dist');
 // every build, and checkReferences() proves they exist by following the actual
 // <script>/<link> tags out of index.html.
 const EXPECTED = [
-  'index.html', 'CNAME', 'site.webmanifest',
+  'index.html', '404.html', 'CNAME', 'site.webmanifest',
+  'robots.txt', 'sitemap.xml',
   'images/avatar.png', 'images/intro_background.jpg',
   'images/projects_background.png',
   'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png',
@@ -27,9 +28,11 @@ const EXPECTED_BUNDLES = [
   { what: 'CSS bundle', re: /^assets\/index-[\w-]+\.css$/ }
 ];
 
-// Tokens that must never survive into a deployed bundle. The first two are the
-// build-time define names -- if they appear as bare identifiers, substitution
-// did not happen and the page will throw a ReferenceError on load.
+// Tokens that must never survive into a deployed bundle. Vite replaces
+// `import.meta.env.VITE_*` with a literal at build time, so seeing any of these
+// in the output means the substitution did not happen and the page would read
+// an undefined value. The last two are placeholders from the old sed-based
+// pipeline, kept so a stale file cannot quietly reintroduce them.
 const FORBIDDEN = [
   'VITE_SITE_EMAIL_BASE64', 'VITE_FULLPAGE_LICENSE_KEY',
   'import.meta.env',
@@ -129,6 +132,17 @@ async function checkReferences(files) {
     if (f.endsWith('.html')) {
       for (const m of text.matchAll(/\b(?:src|href)\s*=\s*"([^"]*)"/g)) {
         refs.push([f, m[1]]);
+      }
+      // og:image and friends carry their URL in `content`, so they are invisible
+      // to the src/href sweep above -- a broken social preview image would ship
+      // unnoticed. Only URL-bearing meta tags are matched by name: most
+      // `content` values are prose (og:description) and are not paths.
+      const META = /<meta\b[^>]*>/gi;
+      const URL_META = /^(og:image(:(url|secure_url))?|twitter:image)$/i;
+      for (const tag of text.match(META) ?? []) {
+        const key = tag.match(/\b(?:property|name)\s*=\s*"([^"]*)"/i)?.[1];
+        const content = tag.match(/\bcontent\s*=\s*"([^"]*)"/i)?.[1];
+        if (key && content && URL_META.test(key)) refs.push([f, content]);
       }
     } else if (f.endsWith('.css')) {
       for (const m of text.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)) {

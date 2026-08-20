@@ -16,12 +16,18 @@ const isLicenseNoise = (m) => licenseNoiseAllowed &&
   (m.includes('licenseKey') || m.includes('alvarotrigo.com/fullPage/pricing'));
 
 /** Collects same-origin failures. External hosts (Google Fonts) are ignored on
- *  purpose -- this suite verifies our build, not a third party's uptime. */
-function watchForErrors(page) {
+ *  purpose -- this suite verifies our build, not a third party's uptime.
+ *
+ *  The origin is taken from the `baseURL` fixture rather than hardcoded: with a
+ *  literal 'localhost' check, pointing baseURL at 127.0.0.1 would make every
+ *  same-origin assertion below silently stop matching, leaving a suite that
+ *  passes while checking nothing. */
+function watchForErrors(page, baseURL) {
   const errors = [];
+  const expectedOrigin = new URL(baseURL).origin;
   const sameOrigin = (url) => {
     try {
-      return new URL(url).hostname === 'localhost';
+      return new URL(url).origin === expectedOrigin;
     } catch {
       return false;
     }
@@ -48,13 +54,17 @@ function watchForErrors(page) {
   return errors;
 }
 
-test('loads without page or same-origin request errors', async ({ page }) => {
-  const errors = watchForErrors(page);
-  await page.goto('/');
-  await expect(page.locator('#fullpage')).toBeVisible();
-  await page.waitForTimeout(500);
-  expect(errors).toEqual([]);
-});
+test('loads without page or same-origin request errors',
+  async ({ page, baseURL }) => {
+    const errors = watchForErrors(page, baseURL);
+    await page.goto('/');
+    await expect(page.locator('#fullpage')).toBeVisible();
+    // Wait for the network to go quiet rather than sleeping a fixed 500ms:
+    // this is what lets late-loading assets report their status, and it neither
+    // races on a slow CI runner nor wastes time on a fast one.
+    await page.waitForLoadState('networkidle');
+    expect(errors).toEqual([]);
+  });
 
 test('all three sections are present and fullpage initialises', async ({ page }) => {
   await page.goto('/');
