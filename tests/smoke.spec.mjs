@@ -142,6 +142,38 @@ test('the active nav item stays readable against its highlight', async ({ page }
   expect(bg).not.toBe(fg);
 });
 
+test('every section can be scrolled to the top, even on a tall display',
+  async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'desktop viewport sizing');
+    // A section shorter than the viewport cannot reach the top once the
+    // document runs out below it. That left Contact stranded in the bottom
+    // half on tall screens -- clicking it in the nav appeared to do nothing.
+    await page.setViewportSize({ width: 1600, height: 1440 });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    for (const id of SECTIONS) {
+      await page.locator(`#nav-menu a[href="${id}"]`).click();
+      await expect.poll(() => page.evaluate((sel) => {
+        const r = document.querySelector(sel).getBoundingClientRect();
+        const header = document.querySelector('#header').getBoundingClientRect();
+        // Near the top of the screen rather than stranded in the lower half.
+        // No lower bound: the hero legitimately sits at document top (0), so
+        // it cannot scroll to below the header the way the others do.
+        return r.top < header.bottom + 60;
+      }, id), { message: `${id} did not scroll to the top` }).toBe(true);
+      // Both indicators must agree, at this height as well as the default.
+      // The scroll-spy previously read a band at the viewport middle, which
+      // on a tall display lands in the NEXT section and highlighted it.
+      await expect.poll(() => page.evaluate(() =>
+        document.querySelector('#nav-menu li.active a')?.getAttribute('href')
+      )).toBe(id);
+      await expect.poll(() => page.evaluate(() =>
+        document.querySelector('.section-nav li.active a')?.getAttribute('href')
+      )).toBe(id);
+    }
+  });
+
 test('the projects grid lists the real projects with working links',
   async ({ page }) => {
     await page.goto('/');

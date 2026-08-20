@@ -78,23 +78,55 @@ function setActiveSection(id) {
       link.removeAttribute('aria-current')
     }
   }
+
 }
 
-if (sections.length) {
-  // Bias the observation band towards the upper half of the viewport so the
-  // section whose heading you are reading is the one that lights up.
-  const observer = new IntersectionObserver((entries) => {
-    const visible = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-    if (visible) {
-      setActiveSection(visible.target.id)
+// The active section is whichever one covers a band just below the header.
+// Measured directly rather than via IntersectionObserver: an observer only
+// fires when an element CROSSES a threshold, so once two sections both overlap
+// the band it stops reporting, and the stored figures go stale mid-scroll --
+// which left the previous section highlighted after navigating. Reading the
+// rects on each frame is a few microseconds and is always correct.
+const BAND_TOP = 0.10
+const BAND_BOTTOM = 0.20
+
+function updateActiveSection() {
+  if (!sections.length) return
+
+  const top = window.innerHeight * BAND_TOP
+  const bottom = window.innerHeight * BAND_BOTTOM
+
+  let winner = null
+  let mostCovered = 0
+  for (const section of sections) {
+    const rect = section.getBoundingClientRect()
+    const covered = Math.min(rect.bottom, bottom) - Math.max(rect.top, top)
+    if (covered > mostCovered) {
+      mostCovered = covered
+      winner = section.id
     }
-  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 })
+  }
 
-  sections.forEach((section) => observer.observe(section))
-  setActiveSection(sections[0].id)
+  // Past the end of the document the band can fall below the last section;
+  // keep the last section marked rather than clearing the highlight.
+  if (!winner && window.scrollY > 0) {
+    winner = sections[sections.length - 1].id
+  }
+  if (winner) setActiveSection(winner)
 }
+
+let scrollQueued = false
+window.addEventListener('scroll', () => {
+  if (scrollQueued) return
+  scrollQueued = true
+  window.requestAnimationFrame(() => {
+    scrollQueued = false
+    updateActiveSection()
+  })
+}, { passive: true })
+
+window.addEventListener('resize', updateActiveSection, { passive: true })
+updateActiveSection()
 
 // Choosing a destination closes the mobile menu.
 select('#nav-menu a.nav-menu-item', true)

@@ -337,6 +337,18 @@ body {
   padding-block: clamp(3.5rem, 8vw, 5.5rem);
 }
 
+/* Only the LAST section needs to be a full screen tall. A section can be
+   scrolled to the top only while there is still a viewport's worth of
+   document below its start; for every earlier section the ones after it
+   supply that, but the last has nothing but the footer. Without this,
+   Contact sat stranded in the lower half on tall displays and clicking it
+   in the nav appeared to do nothing. Content stays top-aligned, so you land
+   on the heading rather than on empty space. */
+main .section:last-child {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .section h2 {
   margin: 0 0 2rem;
   font-family: var(--font-display);
