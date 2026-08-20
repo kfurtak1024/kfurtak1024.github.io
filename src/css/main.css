@@ -267,60 +267,113 @@ body {
 
 /* -----------------------------------------------------------------------------
  Section-dot navigation (desktop scroll-spy)
+
+ Geometry copied from fullPage.js's own #fp-nav so it reads the same: a 14x13
+ cell holding a 4px dot that grows to 10px on hover and 12px when active, with
+ the label sliding in from the right. The one deliberate departure is the hit
+ target -- fullPage's 14x13 anchor is far below the 44px minimum, so an
+ invisible ::before enlarges the clickable area without changing the look.
 ----------------------------------------------------------------------------- */
 .section-nav {
   position: fixed;
-  right: 22px;
+  right: 17px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1020;
+  /* Only the dots themselves should intercept clicks, not the column. */
+  pointer-events: none;
 }
 
 .section-nav ul {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 18px;
+}
+
+.section-nav li {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 13px;
+  margin: 7px;
 }
 
 .section-nav a {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  min-height: 44px;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
   text-decoration: none;
+  pointer-events: auto;
 }
 
-.section-nav-label {
-  font-size: 12px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--color-light-green);
-  opacity: 0;
-  transition: opacity .2s;
-}
-
-.section-nav a:hover .section-nav-label,
-.section-nav a:focus-visible .section-nav-label,
-.section-nav li.active .section-nav-label {
-  opacity: 1;
+/* Enlarges the clickable area around the 14px dot. Width is free, but the
+   HEIGHT must stay under the 27px pitch between dots (13px cell + 2x7px
+   margin): a taller box overlaps its neighbours, and since the later element
+   wins the hit test, clicking one dot would activate the one below it. */
+.section-nav a::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 26px;
+  transform: translate(-50%, -50%);
 }
 
 .section-nav-dot {
-  width: 12px;
-  height: 12px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
   border-radius: 50%;
-  border: 1px solid var(--color-grey);
-  transition: background-color .2s, border-color .2s;
+  background: var(--color-white);
+  transition:
+    width .1s ease-in-out,
+    height .1s ease-in-out,
+    margin .1s ease-in-out,
+    background-color .6s;
+}
+
+.section-nav a:hover .section-nav-dot,
+.section-nav a:focus-visible .section-nav-dot {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
 }
 
 .section-nav li.active .section-nav-dot {
-  background-color: var(--color-light-green);
-  border-color: var(--color-light-green);
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+}
+
+.section-nav-label {
+  position: absolute;
+  top: -2px;
+  right: 20px;
+  color: var(--color-white);
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s ease-in, color .6s;
+}
+
+.section-nav a:hover .section-nav-label,
+.section-nav a:focus-visible .section-nav-label {
+  opacity: 1;
+}
+
+/* Over a light section the white dots would vanish, so they invert -- the
+   same trick the old fullPage build did with its .fp-viewing-1 body class. */
+.section-nav.on-light .section-nav-dot {
+  background: var(--color-black);
+}
+
+.section-nav.on-light .section-nav-label {
+  color: var(--color-black);
 }
 
 /* The dots duplicate the header nav; on touch/narrow screens they are clutter. */

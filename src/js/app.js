@@ -67,6 +67,7 @@ document.addEventListener('keydown', (event) => {
 ----------------------------------------------------------------------------- */
 const sections = select('main .section', true)
 const navLinks = select('#nav-menu a.nav-menu-item, .section-nav a', true)
+const sectionNav = select('.section-nav')
 
 function setActiveSection(id) {
   for (const link of navLinks) {
@@ -79,6 +80,12 @@ function setActiveSection(id) {
     }
   }
 
+  // White dots disappear against a light section, so invert them over one.
+  // Sections declare their own backdrop with data-nav-theme rather than the
+  // script carrying a list of which ids happen to be light.
+  const active = document.getElementById(id)
+  sectionNav.classList.toggle('on-light',
+    active?.dataset.navTheme === 'light')
 }
 
 // The active section is whichever one covers a band just below the header.

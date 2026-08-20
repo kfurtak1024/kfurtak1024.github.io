@@ -264,6 +264,56 @@ test.describe('mobile menu', () => {
 test.describe('desktop section dots', () => {
   test.skip(({ isMobile }) => isMobile, 'dots are hidden on narrow viewports');
 
+  test('use fullPage-style sizing and invert over the light section',
+    async ({ page }) => {
+      await page.goto('/');
+      const sizes = () => page.evaluate(() =>
+        [...document.querySelectorAll('.section-nav li')].map((li) => {
+          const s = getComputedStyle(li.querySelector('.section-nav-dot'));
+          return { active: li.classList.contains('active'),
+                   w: s.width, bg: s.backgroundColor };
+        }));
+
+      // 4px dots, 12px when active -- fullPage.js's own geometry. Polled
+      // because the dot animates its width over .1s, so a single reading
+      // straight after load can land mid-transition.
+      await expect.poll(async () =>
+        (await sizes()).map((d) => (d.active ? 'A' : '.') + d.w).join(' ')
+      ).toBe('A12px .4px .4px');
+
+      // The hit target must stay usable despite the 14px visual cell. Width is
+      // free, but height is capped by the 27px gap between dots -- a taller box
+      // overlaps its neighbour and steals its clicks. So: 44px wide, and at
+      // least the 24px WCAG 2.5.8 minimum tall (not the 44px AAA figure).
+      const hit = await page.evaluate(() => {
+        const s = getComputedStyle(document.querySelector('.section-nav a'), '::before');
+        return { w: parseInt(s.width, 10), h: parseInt(s.height, 10) };
+      });
+      expect(hit.w).toBeGreaterThanOrEqual(44);
+      expect(hit.h).toBeGreaterThanOrEqual(24);
+      expect(hit.h).toBeLessThan(27);
+
+      // White dots would be invisible on the light Projects background.
+      await page.locator('#nav-menu a[href="#section-projects"]').click();
+      await expect.poll(async () => (await sizes())[0].bg).toBe('rgb(0, 0, 0)');
+      await page.locator('#nav-menu a[href="#section-contact"]').click();
+      await expect.poll(async () => (await sizes())[0].bg).toBe('rgb(255, 255, 255)');
+    });
+
+  test('each dot navigates to its own section', async ({ page }) => {
+    await page.goto('/');
+    // The dots sit 27px apart, so an over-large hit area overlaps its
+    // neighbours -- and because the later element wins the hit test, one dot
+    // silently activates another. Clicking every dot is the only way to catch
+    // that, and nothing exercised these before.
+    for (const id of SECTIONS) {
+      await page.locator(`.section-nav a[href="${id}"]`).click();
+      await expect.poll(() => page.evaluate(() =>
+        document.querySelector('#nav-menu li.active a')?.getAttribute('href')
+      ), { message: `dot ${id} activated the wrong section` }).toBe(id);
+    }
+  });
+
   test('track the section in view', async ({ page }) => {
     await page.goto('/');
     const dots = page.locator('.section-nav li');
