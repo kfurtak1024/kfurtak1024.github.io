@@ -7,7 +7,7 @@
     "node": ">=22.12"
   },
   "dependencies": {
-    "fullpage.js": "^4.0.34"
+    "fullpage.js": "^4.0.41"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
