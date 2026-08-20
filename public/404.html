@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Page not found - Krzysztof Furtak</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#000">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <!-- Deliberately self-contained: this page lives in public/ and so cannot
+         reference the hashed CSS bundle, whose filename changes every build.
+         System fonts keep it instant and free of external requests. -->
+    <style>
+      :root {
+        --black: #000;
+        --dark-grey: #222629;
+        --light-green: #86c232;
+        --almost-white: #e0e0e0;
+        --grey: #8c8c8c;
+      }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--black);
+        color: var(--almost-white);
+        font-family: "Roboto Condensed", system-ui, -apple-system, sans-serif;
+        text-align: center;
+        padding: 1.5rem;
+      }
+      main { max-width: 32rem; }
+      h1 {
+        font-size: clamp(4rem, 18vw, 8rem);
+        line-height: 1;
+        margin: 0;
+        color: var(--light-green);
+        letter-spacing: -.03em;
+      }
+      p { font-size: 1.15rem; color: var(--grey); margin: 1rem 0 2rem; }
+      a {
+        display: inline-block;
+        padding: .7rem 1.6rem;
+        border: 2px solid var(--light-green);
+        border-radius: 3px;
+        color: var(--light-green);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        transition: background-color .2s, color .2s;
+      }
+      a:hover, a:focus-visible {
+        background: var(--light-green);
+        color: var(--dark-grey);
+      }
+      a:focus-visible { outline: 2px solid var(--almost-white); outline-offset: 3px; }
+      @media (prefers-reduced-motion: reduce) {
+        a { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>404</h1>
+      <p>That page does not exist.</p>
+      <a href="/">Back to the home page</a>
+    </main>
+  </body>
+</html>
