@@ -1,3 +1,7 @@
+import fullpage from 'fullpage.js'
+import 'fullpage.js/dist/fullpage.css'
+import '../css/main.css'
+
 (function() {
   "use strict";
 
@@ -47,17 +51,21 @@
       e.preventDefault();
 
       let link = select('#email-button')
-      var email = 'MY_EMAIL_BASE64'
+      let email
       try {
-        email = atob(email)
-      } catch (error) {
-        // Just ignore
-      } finally {
-        select('#email').textContent = email
-        link.href = 'mailto:' + email
-        link.classList.add('email-visible')
-        emailDisplayed = true
+        email = atob(import.meta.env.VITE_SITE_EMAIL_BASE64)
+      } catch {
+        // The value is missing or not valid base64. Leave the button in its
+        // "Show email" state rather than revealing a broken address -- the old
+        // code decoded in a try/finally and so rendered the literal text
+        // "undefined" with href="mailto:undefined".
+        return
       }
+
+      select('#email').textContent = email
+      link.href = 'mailto:' + email
+      link.classList.add('email-visible')
+      emailDisplayed = true
     }
   }
 
@@ -72,13 +80,13 @@
 
   on('click', '.mobile-nav-toggle', () => toggleMobileMenu())
 
-  let myFullpage = new fullpage('#fullpage', {
-    licenseKey:'YOUR_KEY_HERE',
+  new fullpage('#fullpage', {
+    licenseKey: import.meta.env.VITE_FULLPAGE_LICENSE_KEY,
     slidesNavigation: true,
     navigation: true,
     navigationPosition: 'right',
     navigationTooltips: ['HOME', 'PROJECTS', 'CONTACT'],
-    onLeave: function(origin, destination, direction) {
+    onLeave: function(origin, destination) {
       toggleNavItem(origin.index)
       toggleNavItem(destination.index)
 

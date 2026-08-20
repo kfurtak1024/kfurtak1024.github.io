@@ -1,0 +1,122 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # Lets the pipeline be exercised on demand without pushing a commit.
+  workflow_dispatch:
+
+# Default to read-only; the deploy job opts into more for itself alone.
+permissions:
+  contents: read
+
+# Never let two deploys race each other onto the live site.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # This name is what the branch ruleset requires as a status check --
+    # renaming it silently disables that protection.
+    name: Build & verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # The single signal for "this run is expected to carry production
+      # secrets", derived from the event rather than from the secrets
+      # themselves. Both the verify guard and the licence-nag assertion read it,
+      # so they cannot drift apart -- and cannot quietly relax themselves.
+      EXPECT_REAL_SECRETS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Secrets are passed as env vars, never interpolated into a shell
+      # command, so values containing / + & " cannot corrupt the build. Where
+      # they are absent (fork PRs) Vite falls back to the dev values in .env.
+      - name: Build 🔧
+        run: npm run build
+        env:
+          VITE_SITE_EMAIL_BASE64: ${{ secrets.MY_EMAIL_BASE64 }}
+          VITE_FULLPAGE_LICENSE_KEY: ${{ secrets.MY_SECRET }}
+
+      # Runs after the build because lint:html validates the built document.
+      - name: Lint 🧹
+        run: npm run lint
+
+      # --require-secrets asserts the dev fallbacks are gone. It keys off the
+      # event, NOT off whether the secret happens to be set: gating on the
+      # secret's own presence would switch the check off in precisely the case
+      # it exists to catch (a deleted or renamed secret shipping dev values).
+      # Fork PRs get no secrets and do not deploy, so they stay lenient.
+      - name: Verify 🔍
+        run: >
+          node scripts/verify.mjs
+          ${{ env.EXPECT_REAL_SECRETS == 'true' && '--require-secrets' || '' }}
+
+      # Browser binaries are large and version-pinned by the lockfile, so cache
+      # them on it. `install` still runs -- it is a no-op on a cache hit, and
+      # the OS-level --with-deps packages are not cacheable anyway.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium firefox
+
+      # The licence key is already baked into dist/ by the build step, so it is
+      # not needed here. Strictness comes from EXPECT_REAL_SECRETS (job env).
+      - name: Smoke test 🧪
+        run: npm test
+
+      # Both paths matter on a failure: playwright-report is the HTML report,
+      # test-results holds the traces that `trace: 'on-first-retry'` records.
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+          if-no-files-found: warn
+
+      # The deploy job publishes this exact artifact rather than rebuilding,
+      # so what ships is byte-for-byte what passed the checks above.
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy 🚀
+    needs: build
+    # THE guard: pull requests build and test, but only a push to main ships.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

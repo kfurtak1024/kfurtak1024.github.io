@@ -1,0 +1,26 @@
+version: 2
+
+updates:
+  # npm dependencies. Every update arrives as a pull request, which now has to
+  # pass Build & verify before it can be merged -- that gate is what makes
+  # automated dependency updates safe to accept.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for the whole dev toolchain rather than five separate ones;
+      # they are only exercised in CI, and they move together.
+      dev-tooling:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # The workflow's own actions, which otherwise silently go stale -- every
+  # version in build.yml was already out of date when it was written.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

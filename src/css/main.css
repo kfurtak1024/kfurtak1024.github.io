@@ -1,9 +1,9 @@
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Global
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 :root {
-  --color-black: #000000;
-  --color-white: #ffffff;
+  --color-black: #000;
+  --color-white: #fff;
   --color-light-green: #86c232;
   --color-grey: #8c8c8c;
   --color-dark-grey: #222629;
@@ -16,41 +16,48 @@
   vertical-align: -.125em;
   fill: var(--color-white);
 }
+
 .hidden {
   display: none !important;
 }
+
 .full-width {
   width: 100%;
 }
+
 .half-width {
   width: 50%;
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Header
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #header {
   font-size: 20px;
-  font-family: "Roboto Condensed";
+  font-family: "Roboto Condensed", sans-serif;
   font-weight: 700;
   background: var(--color-black);
   padding-left: 6px;
   padding-right: 6px;
 }
+
 #header .container {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0 auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
+
 #header a {
   text-decoration: none;
   text-transform: uppercase;
 }
+
 #header .highlight {
   padding-left: 2px;
   color: var(--color-light-green);
 }
+
 #header .logo {
   display: flex;
   align-items: center;
@@ -61,17 +68,15 @@
   line-height: 1;
   letter-spacing: -1px;
 }
+
 #header .logo img {
   border-radius: 50%;
   max-height: 30px;
   vertical-align: middle;
   margin-right: .5rem;
 }
-#header .container {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-}
+
+
 .fixed-top {
   position: fixed;
   top: 0;
@@ -80,9 +85,9 @@
   z-index: 1030;
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Navigation Menu
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 
 /* Desktop navigation  */
 .navbar {
@@ -90,10 +95,12 @@
   align-items: center;
   justify-content: space-between;
 }
+
 .navbar a {
   white-space: nowrap;
   color: var(--color-white);
 }
+
 .navbar ul {
   margin: 0;
   padding: 0;
@@ -101,6 +108,7 @@
   list-style: none;
   align-items: center;
 }
+
 .navbar li {
   position: relative;
   margin-left: 2px;
@@ -109,12 +117,15 @@
   padding-right: 2px;
   line-height: 38px;
 }
+
 .navbar li.active {
   background-color: var(--color-white);
 }
+
 .navbar li.active a {
   color: var(--color-black);
 }
+
 .mobile-nav-toggle {
   cursor: pointer;
   display: none;
@@ -126,13 +137,16 @@
   .mobile-nav-toggle {
     display: block;
   }
+
   .navbar ul {
     display: none;
   }
 }
+
 .mobile-nav-toggle .icon {
   font-size: 30px;  
 }
+
 .navbar-mobile {
   position: fixed;
   overflow: hidden;
@@ -145,78 +159,88 @@
   background-color: var(--color-light-green);
   z-index: 999;
 }
+
 .navbar-mobile .mobile-nav-toggle {
   position: absolute;
   top: 15px;
   right: 15px;
 }
+
 .navbar-mobile ul {
   display: flex;
   margin: auto;
   flex-direction: column;
   justify-content: space-around;
 }
+
 .navbar-mobile li {
   line-height: 2;
 }
+
 .navbar-mobile li.active {
   background-color: transparent;
 }
+
 .navbar-mobile li.active a {
   color: var(--color-white);
 }
+
 .navbar-mobile .nav-menu-social {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0 auto 15px;
 }
+
 #fp-nav ul li a span {
   background-color: var(--color-white);
   transition: background 1s;
 }
+
 .fp-viewing-1 #fp-nav ul li a span {
   background-color: var(--color-black);
 }
+
 .fp-viewing-1 #fp-nav ul li .fp-tooltip {
   color: var(--color-black);
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Footer
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #footer{
   margin-top: auto;
 }
+
 #footer .copyright p {
   font-size: 1em;
   text-align: center;
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Sections
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 .section {
   text-align: left;
-  font-family: "Roboto Condensed";
+  font-family: "Roboto Condensed", sans-serif;
   color: var(--color-grey);
   padding-left: 8px;
   padding-right: 42px;
 }
+
 .section h1 {
   color: var(--color-white);
-  font-family: 'Orbitron', sans-serif;
+  font-family: Orbitron, sans-serif;
   font-size: 3rem;
   font-weight: 90;
   margin-bottom: 1rem;
   text-transform: uppercase;
 }
+
 .section h2 {
   color: var(--color-white);
   font-size: 2.25rem;
   margin-top: 0;
   margin-bottom: 1.5em;
 }
+
 .section p {
   font-weight: 400;
   font-size: 1.5rem;
@@ -224,16 +248,19 @@
   margin-top: 0;
   margin-bottom: 0.75em;
 }
+
 .section strong {
   font-size: 2.25rem;
   white-space: nowrap;
   color: var(--color-light-green);
 }
+
 .section small {
   font-size: 1.25rem;
   margin-top: 0;
   margin-bottom: 0;
 }
+
 .section blockquote {
   font-size: 1.75rem;
   font-style: italic;
@@ -241,6 +268,7 @@
   margin-top: 0;
   margin-bottom: 1.5em;
 }
+
 .section cite {
   font-size: 1rem;
   font-style: normal;
@@ -248,149 +276,164 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+
 .section .night-begins-to-shine {
   white-space: nowrap;
-  background: -webkit-linear-gradient(left, #fc40ff, #543fff); 
-  -webkit-background-clip: text; 
+  background: linear-gradient(to left, #fc40ff, #543fff);
+  background-clip: text; 
   -webkit-text-fill-color: transparent;
 }
+
 .container {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
+  margin: auto;
 }
+
 .flex-container {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
+  margin: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
 @media (min-width: 992px) {
   .container, .flex-container {
     max-width: 960px;
   }
 }
+
 @media (min-width: 1200px) {
   .container, .flex-container {
     max-width: 1140px;
   }
 }
+
 @media (min-width: 1400px) {
   .container, .flex-container {
     max-width: 1320px;
   }
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Intro section
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #section-intro {
-  background-image: url('../images/intro_background.jpg');
+  background-image: url('/images/intro_background.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
+
 #section-intro h1 {
   margin-top: .5rem;
   text-transform: none;
 }
+
 #section-intro .container {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
+  margin: auto;
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  About section
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #section-about {
   background-color: var(--color-dark-grey);
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Projects section
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #section-projects {
-  background-color: var(--color-almost-white);
-  background: url('../images/projects_background.png') repeat
+  background: url('/images/projects_background.png') repeat;
 }
+
 #section-projects h1 {
   color: var(--color-black);
 }
+
 #section-projects h2 {
   color: var(--color-black);
 }
+
 #section-projects p {
   color: var(--color-black);
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Contact section
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 #section-contact {
   background-color: var(--color-dark-grey);
 }
 
-/*-----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  Buttons
------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------- */
 .button {
   position: relative;
   display: flex;
   width: max-content;
   font-size: 20px;
-  font-family: "Roboto Condensed";
+  font-family: "Roboto Condensed", sans-serif;
   text-decoration: none;
   margin-top: 10px;
   margin-bottom: 10px;
   color: var(--color-white);
 }
+
 .button-icon {
   padding: 8px;
 }
+
 .button-label {
   padding: 8px;
 }
+
 .button-icon-email {
   background-color: #424242;
 }
+
 .button-label-email {
   background-color: #5b5b5b;
 }
+
 .email-visible > .button-icon-email {
   background-color: #d33b30;
 }
+
 .email-visible > .button-label-email {
   background-color: #ea4335;
 }
+
 .button-icon-linkedin {
   background-color: #149bcc;
 }
+
 .button-label-linkedin {
   background-color: #15ace5;
 }
+
 .button-icon-send-message {
   background-color: #78aa2c;
 }
+
 .button-label-send-message {
   background-color: var(--color-light-green);
 }
+
 .button-icon-itch {
   background-color: #e25353;
 }
+
 .button-label-itch {
   background-color: #fa5c5c;
 }
+
 .button-icon-github {
   background-color: var(--color-black);
 }
+
 .button-label-github {
   color: var(--color-black);
   background-color: var(--color-almost-white);
