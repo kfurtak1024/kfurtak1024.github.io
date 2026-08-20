@@ -1,111 +1,103 @@
-import fullpage from 'fullpage.js'
-import 'fullpage.js/dist/fullpage.css'
 import '../css/main.css'
 
-const select = (el, all = false) => {
-  el = el.trim()
-  if (all) {
-    return [...document.querySelectorAll(el)]
-  } else {
-    return document.querySelector(el)
-  }
-}
+const select = (el, all = false) =>
+  all ? [...document.querySelectorAll(el)] : document.querySelector(el)
 
-const on = (type, el, listener, all = false) => {
-  let selectEl = select(el, all)
-  if (selectEl) {
-    if (all) {
-      selectEl.forEach(e => e.addEventListener(type, listener))
-    } else {
-      selectEl.addEventListener(type, listener)
-    }
-  }
-}
-
-const toggleNavItem = (index) => {
-  const navItemAt = (index) => {
-    if (index === undefined) {
-      return undefined
-    }
-
-    let a = select('#nav-menu a.nav-menu-item', true)[index]
-    return a ? a.parentNode : undefined
+/* -----------------------------------------------------------------------------
+ Contact email
+ The address is injected at build time as base64 -- obfuscation against
+ scrapers, not a secret, since it is public on the page once revealed.
+----------------------------------------------------------------------------- */
+function revealEmail(e) {
+  const link = select('#email-button')
+  if (link.classList.contains('email-visible')) {
+    return
   }
 
-  let navItem = navItemAt(index)
-  if (navItem) {
-    navItem.classList.toggle('active')
+  e.preventDefault()
+
+  let email
+  try {
+    email = atob(import.meta.env.VITE_SITE_EMAIL_BASE64)
+  } catch {
+    // Missing or malformed value: leave the button reading "Show email"
+    // rather than revealing something broken.
+    return
   }
+
+  select('#email').textContent = email
+  link.href = `mailto:${email}`
+  link.classList.add('email-visible')
 }
 
-function changeEmailVisibility() {
-  var emailDisplayed = false
-  return function(e) {
-    if (emailDisplayed === true) {
-      return
-    }
+select('#email-button').addEventListener('click', revealEmail)
 
-    e.preventDefault();
+/* -----------------------------------------------------------------------------
+ Mobile menu
+----------------------------------------------------------------------------- */
+const navbar = select('#navbar')
+const toggle = select('.mobile-nav-toggle')
 
-    let link = select('#email-button')
-    let email
-    try {
-      email = atob(import.meta.env.VITE_SITE_EMAIL_BASE64)
-    } catch {
-      // The value is missing or not valid base64. Leave the button in its
-      // "Show email" state rather than revealing a broken address -- the old
-      // code decoded in a try/finally and so rendered the literal text
-      // "undefined" with href="mailto:undefined".
-      return
-    }
-
-    select('#email').textContent = email
-    link.href = 'mailto:' + email
-    link.classList.add('email-visible')
-    emailDisplayed = true
-  }
+function setMobileMenu(open) {
+  navbar.classList.toggle('navbar-mobile', open)
+  toggle.setAttribute('aria-expanded', String(open))
+  select('.mobile-nav-toggle .icon', true)
+    .forEach((icon, index) => icon.classList.toggle('hidden', index === (open ? 0 : 1)))
 }
 
-on('click', '#email-button', changeEmailVisibility())
+toggle.addEventListener('click', () => {
+  setMobileMenu(!navbar.classList.contains('navbar-mobile'))
+})
 
-const toggleMobileMenu = () => {
-  select('#navbar .mobile-nav-toggle .icon', true).forEach(el => {
-    el.classList.toggle('hidden')
-  })
-  select('#navbar').classList.toggle('navbar-mobile')
-}
-
-on('click', '.mobile-nav-toggle', () => toggleMobileMenu())
-
-new fullpage('#fullpage', {
-  licenseKey: import.meta.env.VITE_FULLPAGE_LICENSE_KEY,
-  slidesNavigation: true,
-  navigation: true,
-  navigationPosition: 'right',
-  navigationTooltips: ['HOME', 'PROJECTS', 'CONTACT'],
-  onLeave: function(origin, destination) {
-    toggleNavItem(origin.index)
-    toggleNavItem(destination.index)
-
-    if (select('#navbar').classList.contains('navbar-mobile')) {
-      toggleMobileMenu()
-    }
-  },
-  afterRender: function() {
-    select('#nav-menu a.nav-menu-item', true)
-      .forEach(function(menuItem, index) {
-        menuItem.addEventListener(
-          'click',
-          function(e) {
-            e.preventDefault()
-            fullpage_api.moveTo(index + 1)
-            if (select('#navbar').classList.contains('navbar-mobile')) {
-              toggleMobileMenu()
-            }
-          })
-      })
-    toggleNavItem(0)
+// A full-screen overlay that only closes by pointing at the right control is a
+// trap for keyboard users; Escape is the expected way out, and focus belongs
+// back on the button that opened it.
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && navbar.classList.contains('navbar-mobile')) {
+    setMobileMenu(false)
+    toggle.focus()
   }
 })
+
+/* -----------------------------------------------------------------------------
+ Scroll spy
+ Marks the section currently in view as active, in the header menu and in the
+ desktop dot navigation. Replaces fullPage.js's onLeave/afterRender callbacks;
+ scrolling itself is now the browser's, driven by the anchors in the markup.
+----------------------------------------------------------------------------- */
+const sections = select('main .section', true)
+const navLinks = select('#nav-menu a.nav-menu-item, .section-nav a', true)
+
+function setActiveSection(id) {
+  for (const link of navLinks) {
+    const target = link.getAttribute('href') === `#${id}`
+    link.parentElement.classList.toggle('active', target)
+    if (target) {
+      link.setAttribute('aria-current', 'true')
+    } else {
+      link.removeAttribute('aria-current')
+    }
+  }
+}
+
+if (sections.length) {
+  // Bias the observation band towards the upper half of the viewport so the
+  // section whose heading you are reading is the one that lights up.
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+    if (visible) {
+      setActiveSection(visible.target.id)
+    }
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 })
+
+  sections.forEach((section) => observer.observe(section))
+  setActiveSection(sections[0].id)
+}
+
+// Choosing a destination closes the mobile menu.
+select('#nav-menu a.nav-menu-item', true)
+  .forEach((link) => link.addEventListener('click', () => setMobileMenu(false)))
 
 select('#copyright-year').textContent = new Date().getFullYear().toString()

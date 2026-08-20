@@ -2,19 +2,6 @@ import { test, expect } from '@playwright/test';
 
 const SECTIONS = ['#section-intro', '#section-projects', '#section-contact'];
 
-// A build without a real licence key uses a dev placeholder, and fullpage.js
-// rightly complains on the console about it. Tolerate that one message only on
-// runs that are not expected to carry production secrets.
-//
-// EXPECT_REAL_SECRETS is set by CI from the *event* (a push to main), never
-// from whether the secret happens to be present: keying it off the secret
-// would let a deleted or renamed secret silently relax this assertion instead
-// of failing it -- which is the exact scenario worth catching, because that
-// build is the one about to deploy with the nag visible to visitors.
-const licenseNoiseAllowed = process.env.EXPECT_REAL_SECRETS !== 'true';
-const isLicenseNoise = (m) => licenseNoiseAllowed &&
-  (m.includes('licenseKey') || m.includes('alvarotrigo.com/fullPage/pricing'));
-
 /** Collects same-origin failures. External hosts (Google Fonts) are ignored on
  *  purpose -- this suite verifies our build, not a third party's uptime.
  *
@@ -34,9 +21,7 @@ function watchForErrors(page, baseURL) {
   };
 
   page.on('console', (m) => {
-    if (m.type() === 'error' && !isLicenseNoise(m.text())) {
-      errors.push(`console: ${m.text()}`);
-    }
+    if (m.type() === 'error') errors.push(`console: ${m.text()}`);
   });
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('requestfailed', (r) => {
@@ -54,24 +39,60 @@ function watchForErrors(page, baseURL) {
   return errors;
 }
 
+/** Which section currently covers the middle of the viewport. Asserting on
+ *  geometry rather than on a framework's class names keeps these tests honest
+ *  across a change of scrolling implementation -- the previous suite asserted
+ *  fullPage.js's `.fp-section`, so it could only ever describe fullPage.js. */
+async function sectionInView(page) {
+  return page.evaluate((ids) => {
+    const mid = window.innerHeight / 2;
+    for (const id of ids) {
+      const r = document.querySelector(id).getBoundingClientRect();
+      if (r.top <= mid && r.bottom >= mid) return id;
+    }
+    return null;
+  }, SECTIONS);
+}
+
 test('loads without page or same-origin request errors',
   async ({ page, baseURL }) => {
     const errors = watchForErrors(page, baseURL);
     await page.goto('/');
-    await expect(page.locator('#fullpage')).toBeVisible();
-    // Wait for the network to go quiet rather than sleeping a fixed 500ms:
-    // this is what lets late-loading assets report their status, and it neither
-    // races on a slow CI runner nor wastes time on a fast one.
+    await expect(page.locator('h1')).toBeVisible();
     await page.waitForLoadState('networkidle');
     expect(errors).toEqual([]);
   });
 
-test('all three sections are present and fullpage initialises', async ({ page }) => {
+test('has one h1 and all three sections', async ({ page }) => {
   await page.goto('/');
+  await expect(page.locator('h1')).toHaveCount(1);
+  await expect(page.locator('h1')).toHaveText('Krzysztof Furtak');
   for (const s of SECTIONS) await expect(page.locator(s)).toHaveCount(1);
-  // fullpage adds .fp-section once it has taken over the markup.
-  await expect(page.locator('#section-intro')).toHaveClass(/fp-section/);
-  await expect(page.locator('#section-intro')).toHaveClass(/active/);
+});
+
+test('the page scrolls natively -- no scroll hijacking', async ({ page }) => {
+  await page.goto('/');
+  // fullPage.js pinned `html { overflow: hidden }` and translated a wrapper.
+  // Native scrolling is the whole point of the rewrite, so assert it directly.
+  const overflow = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).overflow);
+  expect(overflow).not.toBe('hidden');
+
+  const before = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  // scroll-behavior is smooth, so the scroll is animated -- poll rather than
+  // reading a mid-animation value.
+  await expect.poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(before);
+});
+
+test('the hero fills the viewport, and nothing else has to', async ({ page }) => {
+  await page.goto('/');
+  const { heroHeight, viewport } = await page.evaluate(() => ({
+    heroHeight: document.querySelector('#section-intro').getBoundingClientRect().height,
+    viewport: window.innerHeight
+  }));
+  expect(heroHeight).toBeGreaterThanOrEqual(viewport - 1);
 });
 
 test('navigation moves between sections and tracks the active item',
@@ -86,8 +107,38 @@ test('navigation moves between sections and tracks the active item',
         await page.locator('.mobile-nav-toggle').click();
       }
       await navItems.nth(i).click();
-      await expect(page.locator(SECTIONS[i])).toHaveClass(/active/);
+      await expect.poll(() => sectionInView(page)).toBe(SECTIONS[i]);
       await expect(navItems.nth(i).locator('..')).toHaveClass(/active/);
+    }
+  });
+
+test('the active nav item stays readable against its highlight', async ({ page }) => {
+  await page.goto('/');
+  // `#header a` carries an id, so a colour declared there outranks
+  // `.navbar li.active a` and renders the active item white-on-white --
+  // invisible, with nothing failing. Assert the contrast directly.
+  const { bg, fg } = await page.evaluate(() => {
+    const li = document.querySelector('#nav-menu li.active');
+    return {
+      bg: getComputedStyle(li).backgroundColor,
+      fg: getComputedStyle(li.querySelector('a')).color
+    };
+  });
+  expect(bg).not.toBe(fg);
+});
+
+test('the projects grid lists the real projects with working links',
+  async ({ page }) => {
+    await page.goto('/');
+    const cards = page.locator('.project-card');
+    await expect(cards).toHaveCount(3);
+    await expect(page.locator('.project-head h3')).toHaveText(
+      ['bansoko', 't0d0', 'zecret']);
+
+    // Every card must offer at least one destination, and none may be a stub.
+    for (const href of await page.locator('.project-links a').evaluateAll(
+      (as) => as.map((a) => a.getAttribute('href')))) {
+      expect(href).toMatch(/^https:\/\//);
     }
   });
 
@@ -108,6 +159,19 @@ test('email button reveals a real address and a mailto link', async ({ page }) =
   await expect(button).toHaveClass(/email-visible/);
 });
 
+test('the footer sits at the very end of the page', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  // Smooth scrolling again: poll until the animation settles. Compared within
+  // a pixel rather than to exactly 0 -- sub-pixel layout rounds to -0, and
+  // Object.is(-0, 0) is false, which fails a strict equality check.
+  await expect.poll(() => page.evaluate(() => {
+    const f = document.querySelector('#footer').getBoundingClientRect();
+    return Math.abs(document.documentElement.scrollHeight
+      - (f.bottom + window.scrollY));
+  })).toBeLessThanOrEqual(1);
+});
+
 test('copyright year is filled in', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#copyright-year'))
@@ -123,11 +187,43 @@ test.describe('mobile menu', () => {
     const toggle = page.locator('.mobile-nav-toggle');
 
     await expect(navbar).not.toHaveClass(/navbar-mobile/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
     await toggle.click();
     await expect(navbar).toHaveClass(/navbar-mobile/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
     await page.locator('#nav-menu a.nav-menu-item').nth(1).click();
     await expect(navbar).not.toHaveClass(/navbar-mobile/);
-    await expect(page.locator('#section-projects')).toHaveClass(/active/);
+    await expect.poll(() => sectionInView(page)).toBe('#section-projects');
+  });
+
+  test('closes on Escape and returns focus to the toggle', async ({ page }) => {
+    await page.goto('/');
+    const navbar = page.locator('#navbar');
+    const toggle = page.locator('.mobile-nav-toggle');
+
+    await toggle.click();
+    await expect(navbar).toHaveClass(/navbar-mobile/);
+
+    // A full-screen overlay with no keyboard exit is a trap.
+    await page.keyboard.press('Escape');
+    await expect(navbar).not.toHaveClass(/navbar-mobile/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeFocused();
+  });
+});
+
+test.describe('desktop section dots', () => {
+  test.skip(({ isMobile }) => isMobile, 'dots are hidden on narrow viewports');
+
+  test('track the section in view', async ({ page }) => {
+    await page.goto('/');
+    const dots = page.locator('.section-nav li');
+    await expect(dots).toHaveCount(3);
+    await expect(dots.nth(0)).toHaveClass(/active/);
+
+    await page.locator('#section-contact').scrollIntoViewIfNeeded();
+    await expect(dots.nth(2)).toHaveClass(/active/);
   });
 });

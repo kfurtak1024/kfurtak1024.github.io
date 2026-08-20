@@ -18,11 +18,11 @@ for (const key of Object.keys(process.env)) {
 
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 
-// The secret is named ..._BASE64, but the previous build injected it with sed
-// into a `try { atob(x) } catch {} finally { show(x) }`, which displayed the
-// value whether or not it was actually base64. So the stored secret may be
-// either form. Accept both and always emit canonical base64, so the address
-// stays obfuscated in the bundle and the page has a single case to handle.
+// The secret is named ..._BASE64, but the pipeline that created it never
+// required base64 -- it substituted the value verbatim and displayed whatever
+// came out. The stored secret may therefore hold either form. Accept both and
+// always emit canonical base64, so the address stays obfuscated in the bundle
+// and the page has a single case to handle.
 const rawEmail = process.env.VITE_SITE_EMAIL_BASE64
 if (rawEmail) {
   // Trim the DECODED value too, not just the variable: `echo addr | base64`

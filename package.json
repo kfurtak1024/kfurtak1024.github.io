@@ -6,9 +6,6 @@
   "engines": {
     "node": ">=22.12"
   },
-  "dependencies": {
-    "fullpage.js": "^4.0.41"
-  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
