@@ -6,9 +6,6 @@
   "engines": {
     "node": ">=22.12"
   },
-  "dependencies": {
-    "fullpage.js": "^4.0.41"
-  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
@@ -30,5 +27,9 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint \"src/**/*.css\"",
     "lint:html": "html-validate \"dist/*.html\""
+  },
+  "dependencies": {
+    "@fontsource-variable/orbitron": "^5.3.0",
+    "@fontsource-variable/roboto-condensed": "^5.3.0"
   }
 }

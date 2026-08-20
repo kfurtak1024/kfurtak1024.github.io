@@ -1,121 +1,180 @@
+@import url("./fonts.css");
+
 /* -----------------------------------------------------------------------------
- Global
+ Tokens
 ----------------------------------------------------------------------------- */
 :root {
   --color-black: #000;
   --color-white: #fff;
   --color-light-green: #86c232;
+  --color-green-dark: #78aa2c;
+  --color-green-ink: #4f7a1c;
   --color-grey: #8c8c8c;
   --color-dark-grey: #222629;
   --color-almost-white: #e0e0e0;
+  --color-ink: #3d4245;
+  --color-ink-soft: #5c6266;
+  --color-hairline: #c9cdc4;
+
+  --font-display: "Orbitron Variable", "Orbitron", sans-serif;
+  --font-body: "Roboto Condensed Variable", "Roboto Condensed", sans-serif;
+
+  --hero-scrim: linear-gradient(to right, rgb(0 0 0 / 92%) 0%, rgb(0 0 0 / 72%) 45%, rgb(0 0 0 / 40%) 100%);
+
+  --header-height: 60px;
+  --content-width: 1140px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Anchor jumps must clear the fixed header. The extra 1rem covers the
+     header's 1px bottom border -- which --header-height does not include,
+     since it is a min-height on the inner row -- and leaves the landing
+     heading a little breathing room rather than sitting flush. */
+  scroll-padding-top: calc(var(--header-height) + 1rem);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-black);
+  color: var(--color-grey);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .icon {
   width: 1em;
   height: 1em;
   vertical-align: -.125em;
-  fill: var(--color-white);
+  fill: currentcolor;
+}
+
+.sprite {
+  display: none;
 }
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
-.full-width {
-  width: 100%;
+.container {
+  width: min(100% - 3rem, var(--content-width));
+  margin-inline: auto;
 }
 
-.half-width {
-  width: 50%;
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  padding: 12px 20px;
+  background: var(--color-light-green);
+  color: var(--color-black);
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-light-green);
+  outline-offset: 3px;
 }
 
 /* -----------------------------------------------------------------------------
  Header
 ----------------------------------------------------------------------------- */
 #header {
-  font-size: 20px;
-  font-family: "Roboto Condensed", sans-serif;
-  font-weight: 700;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1030;
   background: var(--color-black);
-  padding-left: 6px;
-  padding-right: 6px;
+  border-bottom: 1px solid #1b1e20;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 20px;
 }
 
-#header .container {
-  margin: 0 auto;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+.header-inner {
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
+/* No colour here on purpose: `#header a` carries an id, so it would outrank
+   `.navbar li.active a` and leave the active item white-on-white. Colour is
+   set on the lower-specificity rules below. */
 #header a {
   text-decoration: none;
   text-transform: uppercase;
 }
 
-#header .highlight {
-  padding-left: 2px;
-  color: var(--color-light-green);
-}
-
-#header .logo {
+.logo {
+  color: var(--color-white);
   display: flex;
   align-items: center;
-  color: var(--color-white);
-  margin-top: 4px;
-  margin-bottom: 4px;
-  padding: 0;
+  gap: .5rem;
   line-height: 1;
   letter-spacing: -1px;
 }
 
-#header .logo img {
+.logo img {
   border-radius: 50%;
-  max-height: 30px;
-  vertical-align: middle;
-  margin-right: .5rem;
 }
 
-
-.fixed-top {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1030;
+.highlight {
+  padding-left: 2px;
+  color: var(--color-light-green);
 }
 
 /* -----------------------------------------------------------------------------
- Navigation Menu
+ Navigation
 ----------------------------------------------------------------------------- */
-
-/* Desktop navigation  */
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.navbar a {
-  white-space: nowrap;
-  color: var(--color-white);
+  gap: 24px;
 }
 
 .navbar ul {
   margin: 0;
   padding: 0;
   display: flex;
-  list-style: none;
   align-items: center;
+  gap: 4px;
+  list-style: none;
 }
 
-.navbar li {
-  position: relative;
-  margin-left: 2px;
-  margin-right: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-  line-height: 38px;
+.navbar a {
+  white-space: nowrap;
+  padding: 6px 10px;
+  display: block;
+  color: var(--color-white);
 }
 
 .navbar li.active {
@@ -126,51 +185,67 @@
   color: var(--color-black);
 }
 
-.mobile-nav-toggle {
-  cursor: pointer;
-  display: none;
-  line-height: 0;
+.nav-menu-social {
+  gap: 2px;
 }
 
-/* Mobile navigation  */
+.nav-menu-social a {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--color-almost-white);
+}
+
+.mobile-nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-white);
+  font-size: 26px;
+  cursor: pointer;
+}
+
 @media (max-width: 991px) {
   .mobile-nav-toggle {
-    display: block;
+    display: flex;
   }
 
-  .navbar ul {
+  .navbar > ul {
     display: none;
   }
 }
 
-.mobile-nav-toggle .icon {
-  font-size: 30px;  
-}
-
+/* Full-screen mobile menu */
 .navbar-mobile {
   position: fixed;
-  overflow: hidden;
+  inset: 0;
   flex-direction: column;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  font-size: 40px;
+  overflow: hidden;
   background-color: var(--color-light-green);
+  font-size: 40px;
   z-index: 999;
 }
 
 .navbar-mobile .mobile-nav-toggle {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 8px;
+  right: 8px;
 }
 
-.navbar-mobile ul {
+.navbar-mobile > ul {
   display: flex;
   margin: auto;
   flex-direction: column;
   justify-content: space-around;
+  gap: 0;
 }
 
 .navbar-mobile li {
@@ -187,207 +262,316 @@
 
 .navbar-mobile .nav-menu-social {
   margin: 0 auto 15px;
-}
-
-#fp-nav ul li a span {
-  background-color: var(--color-white);
-  transition: background 1s;
-}
-
-.fp-viewing-1 #fp-nav ul li a span {
-  background-color: var(--color-black);
-}
-
-.fp-viewing-1 #fp-nav ul li .fp-tooltip {
-  color: var(--color-black);
-}
-
-/* -----------------------------------------------------------------------------
- Footer
------------------------------------------------------------------------------ */
-#footer{
-  margin-top: auto;
-}
-
-#footer .copyright p {
-  font-size: 1em;
-  text-align: center;
+  flex-direction: row;
 }
 
 /* -----------------------------------------------------------------------------
  Sections
 ----------------------------------------------------------------------------- */
 .section {
-  text-align: left;
-  font-family: "Roboto Condensed", sans-serif;
-  color: var(--color-grey);
-  padding-left: 8px;
-  padding-right: 42px;
+  padding-block: clamp(3.5rem, 8vw, 5.5rem);
 }
 
-.section h1 {
-  color: var(--color-white);
-  font-family: Orbitron, sans-serif;
-  font-size: 3rem;
-  font-weight: 90;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
+/* The LAST section is padded out to fill the screen. Two reasons: a section
+   can only be scrolled to the top while a viewport's worth of document
+   remains below its start, and the last one has nothing after it but the
+   footer -- without this, Contact sat stranded in the lower half on tall
+   displays and the nav link appeared to do nothing. Height excludes the fixed
+   header so the section exactly fills what you see once scrolled to, and the
+   content is centred in it rather than stranded at the top above a void. */
+main .section:last-child {
+  /* Subtracts the same offset scroll-padding-top uses, so once scrolled to,
+     the section's bottom lands exactly on the viewport's -- which makes the
+     centred content read as centred rather than sitting low. */
+  min-height: calc(100vh - var(--header-height) - 1rem);
+  min-height: calc(100dvh - var(--header-height) - 1rem);
+  display: flex;
+  align-items: center;
 }
 
 .section h2 {
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
   color: var(--color-white);
-  font-size: 2.25rem;
-  margin-top: 0;
-  margin-bottom: 1.5em;
 }
 
 .section p {
-  font-weight: 400;
-  font-size: 1.5rem;
-  color: var(--color-grey);
-  margin-top: 0;
-  margin-bottom: 0.75em;
+  margin: 0 0 .75em;
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
 }
 
-.section strong {
-  font-size: 2.25rem;
-  white-space: nowrap;
+.lead strong {
+  font-weight: 700;
   color: var(--color-light-green);
-}
-
-.section small {
-  font-size: 1.25rem;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.section blockquote {
-  font-size: 1.75rem;
-  font-style: italic;
-  color: var(--color-light-green);
-  margin-top: 0;
-  margin-bottom: 1.5em;
-}
-
-.section cite {
-  font-size: 1rem;
-  font-style: normal;
-  color: var(--color-black);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.section .night-begins-to-shine {
-  white-space: nowrap;
-  background: linear-gradient(to left, #fc40ff, #543fff);
-  background-clip: text; 
-  -webkit-text-fill-color: transparent;
-}
-
-.container {
-  width: 100%;
-  margin: auto;
-}
-
-.flex-container {
-  width: 100%;
-  margin: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-@media (min-width: 992px) {
-  .container, .flex-container {
-    max-width: 960px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container, .flex-container {
-    max-width: 1140px;
-  }
-}
-
-@media (min-width: 1400px) {
-  .container, .flex-container {
-    max-width: 1320px;
-  }
 }
 
 /* -----------------------------------------------------------------------------
- Intro section
+ Intro
 ----------------------------------------------------------------------------- */
-#section-intro {
-  background-image: url('/images/intro_background.jpg');
+.section-intro {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding-top: calc(var(--header-height) + 2rem);
+  /* Plain JPEG by default; the @supports block below upgrades browsers that
+     can pick a modern codec. Written this way round so a browser without
+     image-set() still gets a background rather than none at all. */
+  background-image: var(--hero-scrim), url('/images/intro_background.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-#section-intro h1 {
-  margin-top: .5rem;
-  text-transform: none;
+/* AVIF is 24 KB against the JPEG's 96 KB at slightly better fidelity
+   (42.4 dB PSNR vs 41.2 for WebP), so it is offered first. */
+@supports (background-image: image-set(url("/images/intro_background.avif") type("image/avif"))) {
+  .section-intro {
+    background-image: var(--hero-scrim), image-set(
+      url('/images/intro_background.avif') type('image/avif'),
+      url('/images/intro_background.webp') type('image/webp'),
+      url('/images/intro_background.jpg') type('image/jpeg')
+    );
+  }
 }
 
-#section-intro .container {
-  margin: auto;
+.section-intro .container {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: clamp(.95rem, 2vw, 1.25rem);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--color-light-green);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.35rem, 7vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  color: var(--color-white);
+  text-wrap: balance;
+}
+
+.section-intro .lead {
+  max-width: 42ch;
+  text-wrap: pretty;
+}
+
+.night-begins-to-shine {
+  background: linear-gradient(to left, #fc40ff, #543fff);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* -----------------------------------------------------------------------------
- About section
+ Projects
 ----------------------------------------------------------------------------- */
-#section-about {
+.section-projects {
+  background-color: var(--color-almost-white);
+}
+
+.section-projects h2 {
+  color: var(--color-black);
+}
+
+.project-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  /* auto-fit means the column count follows the viewport with no breakpoints. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  background: var(--color-white);
+  border: 1px solid var(--color-hairline);
+  border-top: 3px solid var(--color-light-green);
+  transition: border-color .2s;
+}
+
+.project-card-t0d0 {
+  border-top-color: #15ace5;
+}
+
+.project-card-zecret {
+  border-top-color: #fc40ff;
+}
+
+/* A consistent media panel per card. The three screenshots have wildly
+   different shapes -- 1:1 pixel art, a 0.71:1 portrait app, a 2.53:1 terminal
+   -- so they are contained rather than cropped, on a dark panel that bleeds to
+   the card edges. Cropping to a common ratio would reduce the portrait to a
+   sliver and cut text off the terminal. */
+.project-media {
+  /* Negative margins cancel the card's padding so the panel meets its edges. */
+  margin: -22px -22px 0;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-dark-grey);
+}
+
+/* `display: contents` dissolves the <picture> box so the <img> becomes the
+   flex item directly. Without it the picture is the flex item, the image is
+   only bounded relative to that auto-height box, and a tall screenshot
+   overflows the panel and gets clipped instead of fitting. */
+.project-media picture {
+  display: contents;
+}
+
+.project-media img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Bansoko is 256px pixel art: smooth upscaling would turn it to mush. */
+.project-media-pixel img {
+  image-rendering: pixelated;
+  height: 100%;
+  width: auto;
+}
+
+.project-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.project-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+  color: var(--color-black);
+}
+
+.project-stars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: .95rem;
+  color: var(--color-ink-soft);
+}
+
+.project-desc {
+  margin: 0;
+  flex-grow: 1;
+  font-size: 1.05rem;
+  color: var(--color-ink);
+  text-wrap: pretty;
+}
+
+.project-tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-tags li {
+  padding: 3px 8px;
+  border: 1px solid var(--color-hairline);
+  font-size: .8rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0;
+  font-size: .95rem;
+}
+
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--color-black);
+  border-bottom: 2px solid var(--color-black);
+}
+
+.project-links a:last-child {
+  color: var(--color-green-ink);
+  border-bottom-color: var(--color-light-green);
+}
+
+/* -----------------------------------------------------------------------------
+ Contact
+----------------------------------------------------------------------------- */
+.section-contact {
   background-color: var(--color-dark-grey);
 }
 
-/* -----------------------------------------------------------------------------
- Projects section
------------------------------------------------------------------------------ */
-#section-projects {
-  background: url('/images/projects_background.png') repeat;
-}
-
-#section-projects h1 {
-  color: var(--color-black);
-}
-
-#section-projects h2 {
-  color: var(--color-black);
-}
-
-#section-projects p {
-  color: var(--color-black);
-}
-
-/* -----------------------------------------------------------------------------
- Contact section
------------------------------------------------------------------------------ */
-#section-contact {
-  background-color: var(--color-dark-grey);
+.section-contact .lead {
+  margin-bottom: 1.5em;
+  font-size: clamp(1.4rem, 3.5vw, 2.25rem);
+  color: var(--color-white);
 }
 
 /* -----------------------------------------------------------------------------
  Buttons
 ----------------------------------------------------------------------------- */
 .button {
-  position: relative;
-  display: flex;
-  width: max-content;
+  display: inline-flex;
+  align-items: stretch;
+  font-family: var(--font-body);
   font-size: 20px;
-  font-family: "Roboto Condensed", sans-serif;
   text-decoration: none;
-  margin-top: 10px;
-  margin-bottom: 10px;
   color: var(--color-white);
 }
 
 .button-icon {
-  padding: 8px;
+  display: flex;
+  align-items: center;
+  padding: 12px;
 }
 
 .button-label {
-  padding: 8px;
+  padding: 12px 16px;
+}
+
+.button-icon-projects {
+  background-color: var(--color-green-dark);
+}
+
+.button-label-projects {
+  background-color: var(--color-light-green);
+  color: var(--color-black);
+  font-weight: 700;
 }
 
 .button-icon-email {
@@ -414,27 +598,17 @@
   background-color: #15ace5;
 }
 
-.button-icon-send-message {
-  background-color: #78aa2c;
+/* -----------------------------------------------------------------------------
+ Footer
+----------------------------------------------------------------------------- */
+#footer {
+  background: var(--color-black);
+  padding-block: 22px;
 }
 
-.button-label-send-message {
-  background-color: var(--color-light-green);
-}
-
-.button-icon-itch {
-  background-color: #e25353;
-}
-
-.button-label-itch {
-  background-color: #fa5c5c;
-}
-
-.button-icon-github {
-  background-color: var(--color-black);
-}
-
-.button-label-github {
-  color: var(--color-black);
-  background-color: var(--color-almost-white);
+#footer p {
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  color: #6a6f72;
 }

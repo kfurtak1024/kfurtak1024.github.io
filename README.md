@@ -60,13 +60,12 @@ Run `npm run build` before `npm test` or `npm run lint` — both inspect the bui
 
 ### Configuration
 
-Two values are injected at build time and read from the environment by Vite:
+One value is injected at build time and read from the environment by Vite:
 
 | Variable | Purpose |
 | --- | --- |
 | `VITE_SITE_EMAIL_BASE64` | Contact address, base64-encoded to slow down scrapers |
-| `VITE_FULLPAGE_LICENSE_KEY` | fullPage.js licence key |
 
-[`.env`](.env) holds harmless development defaults so a fresh clone builds and tests without any secrets. CI supplies the real values from repository secrets, and `npm run verify -- --require-secrets` fails the build if the development defaults would have shipped. To build locally as production does, put real values in `.env.local` (gitignored).
+[`.env`](.env) holds harmless development defaults so a fresh clone builds and tests without any secrets. CI supplies the real value from the repository secret, and `npm run verify -- --require-secrets` fails the build if the development default would have shipped. To build locally as production does, put a real value in `.env.local` (gitignored).
 
 The email variable accepts either base64 or a plain address, and whitespace is trimmed either way — it is always re-encoded to base64 before it reaches the page.

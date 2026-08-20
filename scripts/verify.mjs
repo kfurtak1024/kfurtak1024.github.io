@@ -13,8 +13,9 @@ const DIST = join(ROOT, 'dist');
 const EXPECTED = [
   'index.html', '404.html', 'CNAME', 'site.webmanifest',
   'robots.txt', 'sitemap.xml',
-  'images/avatar.png', 'images/intro_background.jpg',
-  'images/projects_background.png',
+  'images/avatar.png',
+  'images/intro_background.jpg',
+  'images/intro_background.avif', 'images/intro_background.webp',
   'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png',
   'apple-touch-icon.png',
   'android-chrome-192x192.png', 'android-chrome-512x512.png'
@@ -34,7 +35,7 @@ const EXPECTED_BUNDLES = [
 // an undefined value. The last two are placeholders from the old sed-based
 // pipeline, kept so a stale file cannot quietly reintroduce them.
 const FORBIDDEN = [
-  'VITE_SITE_EMAIL_BASE64', 'VITE_FULLPAGE_LICENSE_KEY',
+  'VITE_SITE_EMAIL_BASE64',
   'import.meta.env',
   'MY_EMAIL_BASE64', 'YOUR_KEY_HERE'
 ];
@@ -169,9 +170,9 @@ async function checkReferences(files) {
 }
 
 // The email is injected as base64 and decoded in the browser. Scanning for
-// "a base64-looking literal" is not enough now that fullpage.js is bundled into
-// the same file -- plenty of its minified strings look like base64. So decode
-// every candidate literal and require that at least one yields a real address.
+// Scanning for "a base64-looking literal" is not precise enough on a minified
+// bundle -- other strings can look like base64. So decode every candidate and
+// require that at least one yields a real address.
 async function checkInjectedEmail(requireReal, files) {
   const bundles = files.filter((f) => /assets[\\/][^\\/]+\.js$/.test(f));
   if (!bundles.length) return fail('no JS bundle found to check the email in');
@@ -201,7 +202,7 @@ async function checkInjectedEmail(requireReal, files) {
     if (shipped.length) {
       fail(`dev fallback value(s) from .env present in a build that requires ` +
            `real ones: ${shipped.join(', ')} ` +
-           '(set VITE_SITE_EMAIL_BASE64 and VITE_FULLPAGE_LICENSE_KEY)');
+           '(set VITE_SITE_EMAIL_BASE64)');
     }
   }
   return found;
