@@ -1,17 +1,28 @@
-<h1 align="center">https://krzysztoffurtak.dev</h1>
+<p align="center">
+  <img src="public/images/avatar.png" width="96" height="96" alt="">
+</p>
+
+<h1 align="center">krzysztoffurtak.dev</h1>
+
+<p align="center"><em>My business card, and the home of my projects.</em></p>
 
 <p align="center">
   <a href="https://github.com/kfurtak1024/kfurtak1024.github.io/actions/workflows/build.yml">
-    <img src="https://github.com/kfurtak1024/kfurtak1024.github.io/actions/workflows/build.yml/badge.svg">
+    <img alt="Build" src="https://github.com/kfurtak1024/kfurtak1024.github.io/actions/workflows/build.yml/badge.svg">
+  </a>
+  <a href="https://krzysztoffurtak.dev">
+    <img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fkrzysztoffurtak.dev&label=site">
   </a>
   <a href="https://validator.nu/?doc=https%3A%2F%2Fkrzysztoffurtak.dev">
-    <img src="https://img.shields.io/w3c-validation/html?targetUrl=https%3A%2F%2Fkrzysztoffurtak.dev">
+    <img alt="W3C validation" src="https://img.shields.io/w3c-validation/html?targetUrl=https%3A%2F%2Fkrzysztoffurtak.dev">
   </a>
 </p>
 
-This is repository of my homepage hosted at GitHub Pages and accessible from https://krzysztoffurtak.dev.
+<p align="center">
+  <a href="https://krzysztoffurtak.dev"><strong>Visit the site →</strong></a>
+</p>
 
-> The idea of this website is to be my business card and the home of my projects.
+Source for my personal homepage: a single-page static site — three sections, no framework — built with Vite and deployed to GitHub Pages.
 
 ## :ship: Deployment
 
@@ -21,29 +32,18 @@ Every push and pull request runs the [Build](https://github.com/kfurtak1024/kfur
 
 The deploy job publishes the exact artifact the checks ran against, via GitHub's own Pages deployment, so what ships is byte-for-byte what was tested.
 
-### One-time repository setup
+> [!WARNING]
+> The branch ruleset requires a status check named **`Build & verify`**. Renaming that job in `build.yml` does not fail anything — it silently removes the requirement, and `main` stops being protected.
 
-Deployment uses `actions/deploy-pages`, which only works once these are in place:
-
-1. **Settings → Pages → Source** must be **GitHub Actions**, not "Deploy from a branch". While the source is set to a branch, the deploy job fails and the site silently stops updating.
-2. **Settings → Pages → Custom domain** must read `krzysztoffurtak.dev`. Under Actions-based deployment the custom domain is held in this setting — not in the `CNAME` file. The file still ships in the artifact, and `scripts/verify.mjs` still asserts it is present, but it is no longer what configures the domain.
-3. **Settings → Rules → Rulesets** protects `main`: pull request required, the **`Build & verify`** status check required, force pushes blocked. Renaming that job in `build.yml` silently disables the requirement.
-
-The `github-pages` branch is a leftover from the previous deployment method and is no longer read by anything.
-
-## :rocket: Development setup
-
-### Install prerequisites
-
-Install **Node.js** — the version is pinned in [`.nvmrc`](.nvmrc), so `nvm use` picks the right one.
-
-### Clone and install
+## :rocket: Development
 
 ```
 git clone https://github.com/kfurtak1024/kfurtak1024.github.io.git
 cd kfurtak1024.github.io
 npm ci
 ```
+
+The supported Node version is declared as `engines` in [`package.json`](package.json) and enforced by [`.npmrc`](.npmrc), so `npm ci` fails fast on an unsupported one. CI builds on Node 24.
 
 ### Everyday commands
 
@@ -53,7 +53,7 @@ npm ci
 | `npm run build` | Build the deployable site into `./dist/` |
 | `npm run preview` | Serve the built `./dist/` exactly as GitHub Pages does |
 | `npm run verify` | Assert the build is complete and every local reference resolves |
-| `npm test` | Playwright smoke tests, desktop + mobile |
+| `npm test` | Playwright smoke tests — Chromium, Firefox and a mobile viewport |
 | `npm run lint` | ESLint, Stylelint and html-validate |
 
 Run `npm run build` before `npm test` or `npm run lint` — both inspect the built output rather than the sources.
@@ -68,3 +68,5 @@ Two values are injected at build time and read from the environment by Vite:
 | `VITE_FULLPAGE_LICENSE_KEY` | fullPage.js licence key |
 
 [`.env`](.env) holds harmless development defaults so a fresh clone builds and tests without any secrets. CI supplies the real values from repository secrets, and `npm run verify -- --require-secrets` fails the build if the development defaults would have shipped. To build locally as production does, put real values in `.env.local` (gitignored).
+
+The email variable accepts either base64 or a plain address, and whitespace is trimmed either way — it is always re-encoded to base64 before it reaches the page.
