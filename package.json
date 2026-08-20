@@ -27,5 +27,9 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint \"src/**/*.css\"",
     "lint:html": "html-validate \"dist/*.html\""
+  },
+  "dependencies": {
+    "@fontsource-variable/orbitron": "^5.3.0",
+    "@fontsource-variable/roboto-condensed": "^5.3.0"
   }
 }

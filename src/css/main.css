@@ -1,3 +1,5 @@
+@import url("./fonts.css");
+
 /* -----------------------------------------------------------------------------
  Tokens
 ----------------------------------------------------------------------------- */
@@ -14,8 +16,8 @@
   --color-ink-soft: #5c6266;
   --color-hairline: #c9cdc4;
 
-  --font-display: "Orbitron", sans-serif;
-  --font-body: "Roboto Condensed", sans-serif;
+  --font-display: "Orbitron Variable", "Orbitron", sans-serif;
+  --font-body: "Roboto Condensed Variable", "Roboto Condensed", sans-serif;
 
   --header-height: 60px;
   --content-width: 1140px;

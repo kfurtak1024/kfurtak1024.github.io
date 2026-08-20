@@ -63,6 +63,21 @@ test('loads without page or same-origin request errors',
     expect(errors).toEqual([]);
   });
 
+test('makes no third-party requests', async ({ page, baseURL }) => {
+  const origin = new URL(baseURL).origin;
+  const external = [];
+  page.on('request', (r) => {
+    if (!r.url().startsWith(origin) && !r.url().startsWith('data:')) {
+      external.push(r.url());
+    }
+  });
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+  // Fonts are self-hosted precisely so the page depends on nobody else --
+  // no Google Fonts, no CDNs. Re-adding one should fail here, loudly.
+  expect(external).toEqual([]);
+});
+
 test('has one h1 and all three sections', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('h1')).toHaveCount(1);
