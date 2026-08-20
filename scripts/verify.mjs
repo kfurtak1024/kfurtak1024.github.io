@@ -13,7 +13,9 @@ const DIST = join(ROOT, 'dist');
 const EXPECTED = [
   'index.html', '404.html', 'CNAME', 'site.webmanifest',
   'robots.txt', 'sitemap.xml',
-  'images/avatar.png', 'images/intro_background.jpg',
+  'images/avatar.png',
+  'images/intro_background.jpg',
+  'images/intro_background.avif', 'images/intro_background.webp',
   'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png',
   'apple-touch-icon.png',
   'android-chrome-192x192.png', 'android-chrome-512x512.png'
