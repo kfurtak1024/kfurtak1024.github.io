@@ -30,6 +30,9 @@ jobs:
       # themselves. Both the verify guard and the licence-nag assertion read it,
       # so they cannot drift apart -- and cannot quietly relax themselves.
       EXPECT_REAL_SECRETS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      # The `secrets` context cannot be read from a step-level `if`, so surface
+      # availability as a plain env value the steps below can test.
+      HAS_EMAIL_SECRET: ${{ secrets.MY_EMAIL_BASE64 != '' }}
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v7
@@ -51,6 +54,15 @@ jobs:
         env:
           VITE_SITE_EMAIL_BASE64: ${{ secrets.MY_EMAIL_BASE64 }}
           VITE_FULLPAGE_LICENSE_KEY: ${{ secrets.MY_SECRET }}
+
+      # Without this, a PR that built on .env dev fallbacks goes green while the
+      # eventual push to main fails at --require-secrets. Warn where it is seen.
+      - name: Warn when built without real secrets
+        if: env.HAS_EMAIL_SECRET != 'true'
+        run: >
+          echo "::warning::Built with the dev fallbacks from .env - MY_EMAIL_BASE64
+          was not available to this run. Merging to main will fail at
+          'Verify' until the repository secret is present."
 
       # Runs after the build because lint:html validates the built document.
       - name: Lint 🧹

@@ -1,5 +1,17 @@
 import { defineConfig } from 'vite'
 
+// GitHub Actions substitutes a missing, renamed or unset secret with an EMPTY
+// STRING rather than leaving the variable unset -- and an empty VITE_* value in
+// process.env takes precedence over .env, so the dev fallback never applies and
+// the build silently ships an empty email. Treat empty as absent so .env can do
+// its job. Deleting the key must happen before Vite loads any env, hence module
+// scope rather than inside the config object.
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith('VITE_') && process.env[key] === '') {
+    delete process.env[key]
+  }
+}
+
 export default defineConfig({
   // Sources live in src/, but the config and .env stay at the project root.
   root: 'src',
