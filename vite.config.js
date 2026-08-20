@@ -1,14 +1,44 @@
 import { defineConfig } from 'vite'
 
+// --- Environment normalisation -------------------------------------------
+// All of this has to run before Vite loads any env, hence module scope.
+
 // GitHub Actions substitutes a missing, renamed or unset secret with an EMPTY
 // STRING rather than leaving the variable unset -- and an empty VITE_* value in
 // process.env takes precedence over .env, so the dev fallback never applies and
-// the build silently ships an empty email. Treat empty as absent so .env can do
-// its job. Deleting the key must happen before Vite loads any env, hence module
-// scope rather than inside the config object.
+// the build silently ships an empty email. Treat empty as absent, and trim the
+// rest: a secret pasted into the GitHub UI very easily carries a trailing
+// newline, which would otherwise end up inside the generated string literal.
 for (const key of Object.keys(process.env)) {
-  if (key.startsWith('VITE_') && process.env[key] === '') {
-    delete process.env[key]
+  if (!key.startsWith('VITE_')) continue
+  const trimmed = process.env[key].trim()
+  if (trimmed === '') delete process.env[key]
+  else process.env[key] = trimmed
+}
+
+const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
+
+// The secret is named ..._BASE64, but the previous build injected it with sed
+// into a `try { atob(x) } catch {} finally { show(x) }`, which displayed the
+// value whether or not it was actually base64. So the stored secret may be
+// either form. Accept both and always emit canonical base64, so the address
+// stays obfuscated in the bundle and the page has a single case to handle.
+const rawEmail = process.env.VITE_SITE_EMAIL_BASE64
+if (rawEmail) {
+  const decoded = Buffer.from(rawEmail, 'base64').toString('utf8')
+  if (isEmail(decoded)) {
+    process.env.VITE_SITE_EMAIL_BASE64 =
+      Buffer.from(decoded, 'utf8').toString('base64')
+  } else if (isEmail(rawEmail)) {
+    process.env.VITE_SITE_EMAIL_BASE64 =
+      Buffer.from(rawEmail, 'utf8').toString('base64')
+  } else {
+    // Deliberately does not echo the value -- it is a secret in CI.
+    throw new Error(
+      'VITE_SITE_EMAIL_BASE64 is neither base64 of an email address nor a ' +
+      `plain email address (got ${rawEmail.length} characters). ` +
+      'Check the MY_EMAIL_BASE64 repository secret.'
+    )
   }
 }
 
