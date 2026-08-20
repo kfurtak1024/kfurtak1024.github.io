@@ -25,7 +25,11 @@ const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 // stays obfuscated in the bundle and the page has a single case to handle.
 const rawEmail = process.env.VITE_SITE_EMAIL_BASE64
 if (rawEmail) {
-  const decoded = Buffer.from(rawEmail, 'base64').toString('utf8')
+  // Trim the DECODED value too, not just the variable: `echo addr | base64`
+  // encodes the echo's trailing newline into the payload, so the decoded string
+  // routinely ends in \n. The previous build shipped exactly that, which is why
+  // the live site's mailto: link carries a stray newline.
+  const decoded = Buffer.from(rawEmail, 'base64').toString('utf8').trim()
   if (isEmail(decoded)) {
     process.env.VITE_SITE_EMAIL_BASE64 =
       Buffer.from(decoded, 'utf8').toString('base64')
