@@ -416,6 +416,46 @@ h1 {
   border-top-color: #fc40ff;
 }
 
+/* A consistent media panel per card. The three screenshots have wildly
+   different shapes -- 1:1 pixel art, a 0.71:1 portrait app, a 2.53:1 terminal
+   -- so they are contained rather than cropped, on a dark panel that bleeds to
+   the card edges. Cropping to a common ratio would reduce the portrait to a
+   sliver and cut text off the terminal. */
+.project-media {
+  /* Negative margins cancel the card's padding so the panel meets its edges. */
+  margin: -22px -22px 0;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-dark-grey);
+}
+
+/* `display: contents` dissolves the <picture> box so the <img> becomes the
+   flex item directly. Without it the picture is the flex item, the image is
+   only bounded relative to that auto-height box, and a tall screenshot
+   overflows the panel and gets clipped instead of fitting. */
+.project-media picture {
+  display: contents;
+}
+
+.project-media img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Bansoko is 256px pixel art: smooth upscaling would turn it to mush. */
+.project-media-pixel img {
+  image-rendering: pixelated;
+  height: 100%;
+  width: auto;
+}
+
 .project-head {
   display: flex;
   align-items: baseline;

@@ -186,6 +186,32 @@ test('the projects grid lists the real projects with working links',
     }
   });
 
+test('every project card shows a screenshot that actually loads',
+  async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#section-projects').scrollIntoViewIfNeeded();
+    // The images are lazy-loaded below the fold, so a missing or misnamed file
+    // would not surface in the initial page load at all.
+    await expect.poll(() => page.evaluate(() =>
+      [...document.querySelectorAll('.project-media img')]
+        .map((i) => i.complete && i.naturalWidth > 0)
+    )).toEqual([true, true, true]);
+
+    // Every screenshot must fit its panel rather than overflow and be clipped.
+    const fits = await page.evaluate(() =>
+      [...document.querySelectorAll('.project-media')].map((m) => {
+        const img = m.querySelector('img').getBoundingClientRect();
+        const box = m.getBoundingClientRect();
+        return img.height <= box.height + 1 && img.width <= box.width + 1;
+      }));
+    expect(fits).toEqual([true, true, true]);
+
+    // Screenshots carry meaning, so they need real alt text, not empty strings.
+    const alts = await page.locator('.project-media img').evaluateAll(
+      (imgs) => imgs.map((i) => i.getAttribute('alt')?.length ?? 0));
+    for (const len of alts) expect(len).toBeGreaterThan(20);
+  });
+
 test('email button reveals a real address and a mailto link', async ({ page }) => {
   await page.goto('/');
   const button = page.locator('#email-button');
