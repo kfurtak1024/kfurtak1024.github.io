@@ -65,21 +65,44 @@
 
     <main id="main">
       <section id="section-intro" class="section section-intro">
-        <div class="container">
-          <p class="eyebrow">Hi, my name is</p>
-          <h1>Krzysztof Furtak</h1>
-          <p class="lead">I'm a <strong>software engineer</strong> specializing in building Java based enterprise applications.</p>
-          <p class="lead">... and when the night begins to shine I become a solo <strong class="night-begins-to-shine">game developer</strong>.</p>
-          <p>
-            <a href="#section-projects" class="button">
-              <span class="button-icon button-icon-projects">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon">
-                  <use href="#arrow-down-icon"/>
-                </svg>
+        <div class="container hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Hi, my name is</p>
+            <h1>Krzysztof Furtak</h1>
+            <p class="lead">I'm a <strong>software engineer</strong> specializing in building Java based enterprise applications.</p>
+            <p class="lead">... and when the night begins to shine I become a solo <strong class="night-begins-to-shine">game developer</strong>.</p>
+            <p class="hero-cta">
+              <a href="#section-projects" class="button">
+                <span class="button-icon button-icon-projects">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon">
+                    <use href="#arrow-down-icon"/>
+                  </svg>
+                </span>
+                <span class="button-label button-label-projects">See my projects</span>
+              </a>
+            </p>
+          </div>
+
+          <!-- Decorative: every line of it restates the copy to its left, so it
+               is hidden from assistive tech rather than read out twice. -->
+          <div class="hero-terminal" aria-hidden="true">
+            <div class="terminal-bar">
+              <span class="terminal-dots">
+                <span></span><span></span><span></span>
               </span>
-              <span class="button-label button-label-projects">See my projects</span>
-            </a>
-          </p>
+              <span class="terminal-title">~/krzysztof</span>
+            </div>
+            <pre class="terminal-body"><span class="term-prompt">$</span> whoami
+software engineer &middot; java &middot; enterprise
+
+<span class="term-prompt">$</span> whoami --after-hours
+<span class="term-accent">solo game developer</span>
+
+<span class="term-prompt">$</span> ls ./projects
+bansoko/  t0d0/  zecret/
+
+<span class="term-prompt">$</span> <span class="terminal-cursor"></span></pre>
+          </div>
         </div>
       </section>
 
@@ -95,11 +118,14 @@
               </div>
               <div class="project-head">
                 <h3>bansoko</h3>
-                <p class="project-stars">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="icon">
-                    <use href="#star-icon"/>
-                  </svg>
-                  17
+                <p class="project-meta">
+                  <span class="project-year">2019</span>
+                  <span class="project-stars">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="icon">
+                      <use href="#star-icon"/>
+                    </svg>
+                    17
+                  </span>
                 </p>
               </div>
               <p class="project-desc">Space-themed Soko-Ban clone created in Python using Pyxel.</p>
@@ -109,8 +135,18 @@
                 <li>Game</li>
               </ul>
               <p class="project-links">
-                <a href="https://github.com/kfurtak1024/bansoko" target="_blank" rel="noopener noreferrer">Code</a>
-                <a href="https://kfurtak1024.itch.io/bansoko" target="_blank" rel="noopener noreferrer">itch.io</a>
+                <a href="https://github.com/kfurtak1024/bansoko" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
+                    <use href="#github-icon"/>
+                  </svg>
+                  Code
+                </a>
+                <a href="https://kfurtak1024.itch.io/bansoko" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                    <use href="#external-link-icon"/>
+                  </svg>
+                  itch.io
+                </a>
               </p>
             </li>
 
@@ -125,16 +161,29 @@
               </div>
               <div class="project-head">
                 <h3>t0d0</h3>
+                <p class="project-meta">
+                  <span class="project-year">2026</span>
+                </p>
               </div>
-              <p class="project-desc">An ephemeral day tracker. Prune the list each morning, tick through it during the day, clear it when you're done. No accounts, no sync, no history.</p>
+              <p class="project-desc">An ephemeral day tracker. No accounts, no sync, no history.</p>
               <ul class="project-tags">
                 <li>TypeScript</li>
                 <li>PWA</li>
                 <li>Offline-first</li>
               </ul>
               <p class="project-links">
-                <a href="https://github.com/kfurtak1024/t0d0" target="_blank" rel="noopener noreferrer">Code</a>
-                <a href="https://t0d0.krfu.dev/" target="_blank" rel="noopener noreferrer">t0d0.krfu.dev</a>
+                <a href="https://github.com/kfurtak1024/t0d0" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
+                    <use href="#github-icon"/>
+                  </svg>
+                  Code
+                </a>
+                <a href="https://t0d0.krfu.dev/" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                    <use href="#external-link-icon"/>
+                  </svg>
+                  t0d0.krfu.dev
+                </a>
               </p>
             </li>
 
@@ -149,6 +198,9 @@
               </div>
               <div class="project-head">
                 <h3>zecret</h3>
+                <p class="project-meta">
+                  <span class="project-year">2026</span>
+                </p>
               </div>
               <p class="project-desc">Your diary, encrypted, in the terminal.</p>
               <ul class="project-tags">
@@ -157,8 +209,18 @@
                 <li>Cryptography</li>
               </ul>
               <p class="project-links">
-                <a href="https://github.com/kfurtak1024/zecret" target="_blank" rel="noopener noreferrer">Code</a>
-                <a href="https://zecret.krfu.dev/" target="_blank" rel="noopener noreferrer">zecret.krfu.dev</a>
+                <a href="https://github.com/kfurtak1024/zecret" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
+                    <use href="#github-icon"/>
+                  </svg>
+                  Code
+                </a>
+                <a href="https://zecret.krfu.dev/" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                    <use href="#external-link-icon"/>
+                  </svg>
+                  zecret.krfu.dev
+                </a>
               </p>
             </li>
           </ul>
@@ -219,6 +281,9 @@
       </symbol>
       <symbol id="star-icon" viewBox="0 0 576 512">
         <path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2-137.1 73.2c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L36.8 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L272 13.5C276 5.2 284.4 0 293.6 0h-5.7z"/>
+      </symbol>
+      <symbol id="external-link-icon" viewBox="0 0 512 512">
+        <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/>
       </symbol>
       <symbol id="arrow-down-icon" viewBox="0 0 384 512">
         <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
