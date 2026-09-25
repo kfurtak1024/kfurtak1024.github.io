@@ -3,8 +3,8 @@
  *
  * This is a generator rather than a hand-made export so the card cannot drift
  * away from the site: it pulls the real tokens, the real Orbitron and Roboto
- * Condensed from node_modules, and the real avatar. When the palette moves,
- * re-run it. It is NOT wired into `npm run build` -- the output is committed,
+ * Condensed from node_modules, the hero photograph and a portrait. When the
+ * palette moves, re-run it. It is NOT wired into `npm run build` -- the output is committed,
  * because a build that shells out to a headless browser to produce a static
  * asset would make every deploy depend on it.
  *
@@ -13,6 +13,11 @@
  * og:image wants 1200x630 (1.91:1). The previous image was avatar.png, a 1:1
  * square: LinkedIn and X both crop it to a letterbox, so it lost the top and
  * bottom of a face that was the whole point of it.
+ *
+ * scripts/assets/og-portrait.jpg is a 440px square crop of a studio portrait
+ * with its grey backdrop darkened, so the circle sits in the dark card instead
+ * of being its brightest area. It lives here rather than in public/ because
+ * only this script uses it. The site itself keeps the pixel avatar as its logo.
  */
 import { chromium } from '@playwright/test';
 import { writeFile, readFile } from 'node:fs/promises';
@@ -36,11 +41,11 @@ const dataUri = async (path, mime) =>
 const fontUri = (pkg, file) =>
   dataUri(join('node_modules', pkg, 'files', file), 'font/woff2');
 
-const [orbitron, robotoCondensed, avatar, photo] = await Promise.all([
+const [orbitron, robotoCondensed, portrait, photo] = await Promise.all([
   fontUri('@fontsource-variable/orbitron', 'orbitron-latin-wght-normal.woff2'),
   fontUri('@fontsource-variable/roboto-condensed',
           'roboto-condensed-latin-wght-normal.woff2'),
-  dataUri('public/images/avatar.png', 'image/png'),
+  dataUri('scripts/assets/og-portrait.jpg', 'image/jpeg'),
   dataUri('public/images/intro_background.jpg', 'image/jpeg')
 ]);
 
@@ -132,14 +137,16 @@ const html = `<!DOCTYPE html>
   .roles strong { font-weight: 700; color: var(--light-green); }
   .roles .after-hours { font-weight: 700; color: var(--violet); }
 
-  .avatar {
+  .portrait {
     position: absolute;
-    top: 72px;
-    right: 88px;
-    width: 148px;
-    height: 148px;
+    top: 50%;
+    right: 110px;
+    width: 216px;
+    height: 216px;
+    transform: translateY(-50%);
     border-radius: 50%;
-    border: 2px solid rgb(255 255 255 / 12%);
+    border: 3px solid rgb(255 255 255 / 14%);
+    box-shadow: 0 18px 48px rgb(0 0 0 / 50%);
   }
 
   .domain {
@@ -157,7 +164,7 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
   <div class="photo"></div>
-  <img class="avatar" src="${avatar}" alt="">
+  <img class="portrait" src="${portrait}" alt="">
   <div class="content">
     <p class="eyebrow">Software Engineer</p>
   </div>

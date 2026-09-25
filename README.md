@@ -69,7 +69,7 @@ Two images in [`public/images/`](public/images) are produced by scripts rather t
 
 The starfield is deterministic: same seed, same bytes, so re-running it produces no diff unless you changed something. It is 9.4 kB that gzips to 2.0 kB.
 
-The OG card renders over the hero photograph and in the site's real fonts, pulled out of `node_modules` and inlined as `data:` URIs — a page built with `setContent()` has no origin and Chromium silently refuses to load `file://` subresources into it, so the script asserts both faces actually loaded before it screenshots. At 84 kB it is the largest image in the build, but no visitor ever downloads it; only scrapers do.
+The OG card renders over the hero photograph, with a portrait from `scripts/assets/`, and in the site's real fonts, pulled out of `node_modules` and inlined as `data:` URIs — a page built with `setContent()` has no origin and Chromium silently refuses to load `file://` subresources into it, so the script asserts both faces actually loaded before it screenshots. At 84 kB it is the largest image in the build, but no visitor ever downloads it; only scrapers do.
 
 ### Configuration
 
