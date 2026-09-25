@@ -150,7 +150,7 @@ function setActiveSection(id) {
     const target = link.getAttribute('href') === `#${id}`
     link.parentElement.classList.toggle('active', target)
     if (target) {
-      link.setAttribute('aria-current', 'true')
+      link.setAttribute('aria-current', 'location')
     } else {
       link.removeAttribute('aria-current')
     }

@@ -140,8 +140,26 @@ test('navigation moves between sections and tracks the active item',
       await navItems.nth(i).click();
       await expect.poll(() => sectionInView(page)).toBe(SECTIONS[i]);
       await expect(navItems.nth(i).locator('..')).toHaveClass(/active/);
+      // Screen readers get the same answer: exactly one link is the current
+      // location.
+      await expect(navItems.nth(i)).toHaveAttribute('aria-current', 'location');
+      await expect(page.locator('#nav-menu [aria-current]')).toHaveCount(1);
     }
   });
+
+test('structured data describes the same person as the page', async ({ page }) => {
+  await page.goto('/');
+  const person = JSON.parse(await page.locator('script[type="application/ld+json"]')
+    .textContent());
+  expect(person['@type']).toBe('Person');
+  expect(person.name).toBe('Krzysztof Furtak');
+  // Every profile it claims must be one the page itself links into.
+  const pageLinks = await page.locator('a[href^="https://"]')
+    .evaluateAll((as) => as.map((a) => a.href));
+  for (const url of person.sameAs) {
+    expect(pageLinks.some((href) => href.startsWith(url)), url).toBe(true);
+  }
+});
 
 test('the active nav item stays readable against its highlight', async ({ page }) => {
   await page.goto('/');
