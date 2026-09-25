@@ -14,9 +14,7 @@
  *      that had just finished reducing itself to two.
  *
  * The subject is not arbitrary. The hero says "...and when the night begins to
- * shine I become a solo game developer", and Contact is the one section that
- * names both halves of that (Work / After hours, in the "At a glance" list).
- * A night sky is the after-hours half made visible.
+ * shine, I become a solo game developer"; a night sky is that line made visible.
  *
  * Output is deterministic: same seed, same bytes.
  */

@@ -6,7 +6,9 @@
 :root {
   /* Dark surfaces: near-black rather than #000, which halates against white text. */
   --color-surface: #0b0d0f;
-  --color-surface-raised: #14181c;
+  /* The Contact section's base, under its scrim: a little lighter than the
+     page, so the light at the top right has something to lift. */
+  --color-surface-contact: #16181a;
 
   /* The one light surface, behind the project cards. */
   --color-paper: #f7f7f3;
@@ -18,7 +20,7 @@
   --color-violet: #a78bfa;
   --color-grey: #8a9399;
   --color-body: #b7bec2;
-  --color-almost-white: #e0e0e0;
+  --color-almost-white: #dfe3e6;
 
   /* Ink: text on the light surface. */
   --color-ink-strong: #14181c;
@@ -26,6 +28,12 @@
   --color-ink-soft: #5c6266;
   /* Card border. Warm-neutral, to match the warm paper it sits on. */
   --color-hairline: #c9c8c5;
+
+  /* Lines on the dark surfaces, in three strengths: dividers between areas,
+     the outline of a panel, and the outline of a control. */
+  --color-rule: rgb(255 255 255 / 8%);
+  --color-border: rgb(255 255 255 / 11%);
+  --color-border-strong: rgb(255 255 255 / 18%);
 
   --font-display: "Orbitron Variable", "Orbitron", sans-serif;
   --font-body: "Roboto Condensed Variable", "Roboto Condensed", sans-serif;
@@ -192,7 +200,7 @@ body.menu-is-open {
 
 /* No rule at the top of the page, where it would cut across the hero. */
 #header.is-scrolled {
-  border-bottom-color: #1e2225;
+  border-bottom-color: var(--color-rule);
 }
 
 .header-inner {
@@ -334,7 +342,7 @@ body.menu-is-open {
   flex-direction: column;
   overflow: hidden;
   background-color: var(--color-surface);
-  border-top: 1px solid #1e2225;
+  border-top: 1px solid var(--color-rule);
   font-size: 2rem;
   z-index: 999;
 }
@@ -509,17 +517,17 @@ main .section:last-child {
  what the copy beside it already says.
 ----------------------------------------------------------------------------- */
 .hero-terminal {
-  border: 1px solid rgb(255 255 255 / 11%);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   /* Translucent, so the photograph stays part of the composition. */
-  background: rgb(10 12 14 / 86%);
+  background: rgb(11 13 15 / 86%);
   box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
   overflow: hidden;
 }
 
 @supports (backdrop-filter: blur(1px)) {
   .hero-terminal {
-    background: rgb(10 12 14 / 72%);
+    background: rgb(11 13 15 / 72%);
     backdrop-filter: blur(8px);
   }
 }
@@ -530,7 +538,7 @@ main .section:last-child {
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   background: rgb(255 255 255 / 4%);
-  border-bottom: 1px solid rgb(255 255 255 / 8%);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .terminal-dots {
@@ -683,7 +691,7 @@ strong.night-begins-to-shine {
      negative margins, to the rounded corners. */
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgb(12 14 16 / 5%);
+  box-shadow: 0 1px 2px rgb(11 13 15 / 5%);
 }
 
 /* One dark panel per card. The screenshots have very different shapes (square
@@ -704,7 +712,7 @@ strong.night-begins-to-shine {
      dominant hue. */
   background:
     linear-gradient(to bottom, rgb(255 255 255 / 5%), rgb(255 255 255 / 0%) 60%),
-    var(--project-tint, var(--color-surface-raised));
+    var(--project-tint, var(--color-surface));
 }
 
 /* Stacked one per row on a tablet, a 16:10 panel across the full width would be
@@ -810,7 +818,7 @@ strong.night-begins-to-shine {
 .project-tags li {
   padding: var(--space-1) var(--space-3);
   border-radius: 999px;
-  background: rgb(20 24 27 / 6%);
+  background: rgb(20 24 28 / 6%);
   font-size: .8rem;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -874,8 +882,8 @@ strong.night-begins-to-shine {
 ----------------------------------------------------------------------------- */
 /* A night sky under a scrim: a generated starfield
    (scripts/make-contact-starfield.mjs) with a neutral wash of light, in the
-   hero's tones. The hero says "when the night begins to shine", and this is the
-   section that names both halves of that.
+   hero's tones, and the hero's own line made visible: "when the night begins
+   to shine".
 
    Text contrast was measured against the composited background (text hidden,
    pixels under each glyph sampled, worst 5x5 mean) at 1440 / 1280 / 390px,
@@ -886,7 +894,7 @@ strong.night-begins-to-shine {
    The business card carries its own near-opaque background, so its text does
    not depend on the artwork. */
 .section-contact {
-  background-color: #16181a;
+  background-color: var(--color-surface-contact);
   background-image:
     var(--contact-scrim),
     radial-gradient(72% 82% at 84% -4%, rgb(255 255 255 / 7%), transparent 66%),
@@ -925,15 +933,15 @@ strong.night-begins-to-shine {
    closes on the same kind of object. */
 .contact-card {
   padding: var(--space-6);
-  border: 1px solid rgb(255 255 255 / 11%);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: rgb(10 12 14 / 86%);
+  background: rgb(11 13 15 / 86%);
   box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
 }
 
 @supports (backdrop-filter: blur(1px)) {
   .contact-card {
-    background: rgb(10 12 14 / 72%);
+    background: rgb(11 13 15 / 72%);
     backdrop-filter: blur(8px);
   }
 }
@@ -955,12 +963,8 @@ strong.night-begins-to-shine {
   min-width: 0;
 }
 
-/* Borderless inside the card: it sits at the end of the row it copies, and a
-   boxed button there would outweigh the address itself. */
 .contact-card .icon-button {
   flex: none;
-  border-color: transparent;
-  color: var(--color-grey);
 }
 
 .contact-card-head {
@@ -968,13 +972,13 @@ strong.night-begins-to-shine {
   align-items: center;
   gap: var(--space-5);
   padding-bottom: var(--space-5);
-  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .contact-card-photo {
   flex: none;
   border-radius: 50%;
-  border: 2px solid rgb(255 255 255 / 12%);
+  border: 2px solid var(--color-border);
   object-fit: cover;
 }
 
@@ -1054,7 +1058,7 @@ strong.night-begins-to-shine {
 /* A quieter button: the weight and grey of the card's link rows, so it reads as
    one more way to reach him rather than a second call to action. */
 .button-secondary {
-  border-color: rgb(255 255 255 / 18%);
+  border-color: var(--color-border-strong);
   font-size: 1rem;
   font-weight: 400;
   color: var(--color-body);
@@ -1087,6 +1091,8 @@ strong.night-begins-to-shine {
   overflow-wrap: anywhere;
 }
 
+/* Borderless: it sits at the end of the row it acts on, and a boxed button
+   there would outweigh the text itself. */
 .icon-button {
   display: inline-flex;
   width: 44px;
@@ -1094,16 +1100,15 @@ strong.night-begins-to-shine {
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid rgb(255 255 255 / 24%);
+  border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--color-white);
+  color: var(--color-grey);
   cursor: pointer;
-  transition: border-color .2s, color .2s;
+  transition: color .2s;
 }
 
 .icon-button:hover {
-  border-color: var(--color-light-green);
   color: var(--color-light-green);
 }
 
@@ -1155,7 +1160,7 @@ strong.night-begins-to-shine {
    the token would make that circular. */
 #footer {
   background: var(--color-surface);
-  border-top: 1px solid rgb(255 255 255 / 7%);
+  border-top: 1px solid var(--color-rule);
   display: flex;
   align-items: center;
   padding-block: var(--space-6);

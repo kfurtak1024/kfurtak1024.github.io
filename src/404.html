@@ -19,8 +19,8 @@
         --surface: #0b0d0f;
         --ink-strong: #14181c;
         --light-green: #9acd4a;
-        --almost-white: #e0e0e0;
-        --grey: #8a9399;
+        --green-dark: #84b43d;
+        --body: #b7bec2;
       }
       html, body { height: 100%; }
       body {
@@ -29,7 +29,7 @@
         align-items: center;
         justify-content: center;
         background: var(--surface);
-        color: var(--almost-white);
+        color: var(--body);
         font-family: "Roboto Condensed Variable", "Roboto Condensed", system-ui, sans-serif;
         text-align: center;
         padding: 1.5rem;
@@ -43,23 +43,21 @@
         margin: 0;
         color: var(--light-green);
       }
-      p { font-size: 1.15rem; color: var(--grey); margin: 1rem 0 2rem; }
+      p { font-size: 1.15rem; margin: 1rem 0 2rem; }
+      /* The site's primary button (.button.button-primary in main.css). */
       a {
         display: inline-block;
-        padding: .7rem 1.6rem;
-        border: 2px solid var(--light-green);
+        padding: 12px 20px;
         border-radius: 8px;
-        color: var(--light-green);
-        text-decoration: none;
-        text-transform: uppercase;
-        letter-spacing: .05em;
-        transition: background-color .2s, color .2s;
-      }
-      a:hover, a:focus-visible {
         background: var(--light-green);
         color: var(--ink-strong);
+        font-size: 1.125rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color .2s;
       }
-      a:focus-visible { outline: 2px solid var(--almost-white); outline-offset: 3px; }
+      a:hover { background: var(--green-dark); }
+      a:focus-visible { outline: 2px solid var(--light-green); outline-offset: 3px; }
       @media (prefers-reduced-motion: reduce) {
         a { transition: none; }
       }
