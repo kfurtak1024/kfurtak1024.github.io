@@ -6,34 +6,70 @@
 :root {
   /* Dark surfaces. Near-black rather than #000: pure black halates against
      white text and reads as an unmade decision rather than a chosen colour. */
-  --color-surface: #0c0e10;
-  --color-surface-raised: #14181b;
+  --color-surface: #0b0d0f;
+  --color-surface-raised: #14181c;
 
   /* The one light surface. A warm off-white rather than the flat #e0e0e0 it
      replaces, which looked like an unstyled backdrop between two dark bands. */
-  --color-paper: #f6f5f1;
+  --color-paper: #f7f7f3;
 
   --color-white: #fff;
-  --color-light-green: #86c232;
-  --color-green-dark: #78aa2c;
-  --color-green-ink: #4f7a1c;
+  --color-light-green: #9acd4a;
+  --color-green-dark: #84b43d;
+  --color-green-ink: #4d701d;
   --color-violet: #a78bfa;
-  --color-pink: #f472b6;
-  --color-grey: #8c8c8c;
+  --color-grey: #8a9399;
+  --color-body: #b7bec2;
   --color-almost-white: #e0e0e0;
 
   /* Ink -- text ON the light surface. Near-black for the same reason the
      surfaces are: #000 on off-white is harsher than anything in print. */
-  --color-ink-strong: #14181b;
+  --color-ink-strong: #14181c;
   --color-ink: #3d4245;
   --color-ink-soft: #5c6266;
-  --color-hairline: #c9cdc4;
+  /* Warm-neutral, not green. #c9cdc4 had G above both R and B, which read
+     muddy beside the neutral greys; the paper it sits on is warm (R>G>B), so
+     the hairline follows that bias rather than opposing it. Same lightness as
+     before -- the complaint was the cast, not the strength, and the backlog's
+     suggested #d7d7d4 would have lightened the card border by a third. Used in
+     exactly one place now: the project card. */
+  --color-hairline: #c9c8c5;
 
   --font-display: "Orbitron Variable", "Orbitron", sans-serif;
   --font-body: "Roboto Condensed Variable", "Roboto Condensed", sans-serif;
   --font-mono: ui-monospace, sfmono-regular, "SF Mono", menlo, consolas, monospace;
 
-  --hero-scrim: linear-gradient(to right, rgb(12 14 16 / 93%) 0%, rgb(12 14 16 / 80%) 50%, rgb(12 14 16 / 58%) 100%);
+  --hero-scrim: linear-gradient(to right, rgb(11 13 15 / 93%) 0%, rgb(11 13 15 / 80%) 50%, rgb(11 13 15 / 58%) 100%);
+  /* Same idea as the hero scrim and deliberately the same construction, so the
+     page has one technique for putting text over artwork rather than two. It is
+     tuned the other way round though: the hero is a photograph that should still
+     read as one, while this sits under the section's own copy.
+
+     The stops are placed off the layout rather than by eye, and the layout was
+     re-measured rather than taken from the previous comment here, which had gone
+     stale: it said the copy column ends at 41% and the "At a glance" column at
+     73%. Measured at 1440px they are 52% and 90%. What actually matters is where
+     the GLYPHS stop, since the columns are much wider than their text -- dt ends
+     at 61%, dd at 71%, the lead at 37% -- so the ramp holds near-opaque to ~62%,
+     eases to 76%, and only opens up over the last quarter, which carries no text
+     at any viewport. The previous curve held 88% all the way to 75% and hid the
+     artwork almost entirely: 14 kB of something nobody could see. */
+  --contact-scrim: linear-gradient(to right, rgb(11 13 15 / 96%) 0%, rgb(11 13 15 / 88%) 34%, rgb(11 13 15 / 55%) 62%, rgb(11 13 15 / 22%) 100%);
+
+  /* Spacing scale, 4px base. Before this the sheet carried 2, 3, 6, 7, 10, 12,
+     15, 16, 20, 22 and 24px plus .6rem, .65rem, .75rem, .85rem, .9rem, 1.15rem,
+     1.25rem and 1.35rem -- values chosen one at a time, so nothing lined up
+     with anything else. Fluid clamps and em-relative typographic margins are
+     deliberately NOT on this scale: they answer to the viewport and to the
+     font, not to the layout grid. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
 
   --header-height: 60px;
   /* Where an anchored section comes to rest, and the height the last one has
@@ -51,8 +87,11 @@
      Contact. Overlapping by a pixel hides a residue that is always < 1px by
      construction, and costs only a pixel of section padding nobody can see. */
   --header-offset: var(--header-height);
-  /* Declared rather than left to the content, so the last section can subtract
-     it and land the footer inside the viewport. #footer holds itself to it. */
+  /* How much room the last section gives up so the footer lands inside the
+     viewport. app.js overwrites this with the footer's measured height and
+     keeps it current through a ResizeObserver; these values are the no-JS
+     fallback, and are only approximately right -- the footer's real height
+     can change with the viewport and with the webfont. */
   --footer-height: 4.5rem;
   --content-width: 1140px;
 
@@ -91,7 +130,7 @@ html {
 body {
   margin: 0;
   background: var(--color-surface);
-  color: var(--color-grey);
+  color: var(--color-body);
   font-family: var(--font-body);
   /* 17px. A condensed face sets narrower than a normal one at the same size,
      so it needs the extra pixel more, not less, to hold a comfortable
@@ -100,6 +139,14 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizelegibility;
+}
+
+/* Paragraph spacing belongs to whichever rule owns the paragraph. This clears
+   the UA default at element specificity (0,0,1), so it loses to every class
+   rule in the sheet -- which is the whole point of putting it here rather than
+   on `.section p`, where the same declaration outranked them instead. */
+p {
+  margin: 0;
 }
 
 .icon {
@@ -117,6 +164,26 @@ body {
   display: none;
 }
 
+/* The mobile menu is a fixed, opaque, full-screen panel. Without this the
+   document underneath still scrolls behind it, so closing the menu drops you
+   somewhere other than where you opened it. Set from app.js alongside the
+   `inert` it puts on everything the overlay covers. */
+body.menu-is-open {
+  overflow: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .container {
   width: min(100% - 3rem, var(--content-width));
   margin-inline: auto;
@@ -127,7 +194,7 @@ body {
   left: -9999px;
   top: 0;
   z-index: 2000;
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
   background: var(--color-light-green);
   color: var(--color-ink-strong);
   font-weight: 700;
@@ -142,18 +209,47 @@ body {
   outline-offset: 3px;
 }
 
+/* The lime ring measures 10.39:1 against the dark surface and 1.87:1 against a
+   white card -- under the 3:1 a focus indicator has to make against what it
+   sits on, so the one place the page puts focusable text on light is the one
+   place the ring stops working. Exactly item 15's problem with the kicker, and
+   the same token answers it: --color-green-ink is 4.66:1 there. */
+.section-projects :focus-visible {
+  outline-color: var(--color-green-ink);
+}
+
 /* -----------------------------------------------------------------------------
  Header
 ----------------------------------------------------------------------------- */
+/* Solid, not translucent. This carried `rgb(12 14 16 / 90%)` and a 12px
+   backdrop-filter for a while (item 12). The blur looked right over the hero
+   and over the project screenshots, but the page still has a full-width light
+   band, and parking on Contact puts all of that band behind the bar -- so the
+   header arrived at the last section as a grey slab. Raising the alpha only
+   traded one problem for another: at 96% the composite is #151719, near enough
+   to the surface, but the blur is then invisible and the filter is machinery
+   doing nothing. Solid is the honest version of that. The scroll-triggered
+   rule below is the half of item 12 that was actually working, and it stays. */
 #header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 1030;
   background: var(--color-surface);
-  border-bottom: 1px solid #1e2225;
+  /* Always 1px, so the header keeps occupying exactly --header-offset whether
+     the rule is visible or not. Only the colour changes on scroll -- animating
+     the width would shift every anchor landing by a pixel. */
+  border-bottom: 1px solid transparent;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 20px;
+  transition: border-color .2s;
+}
+
+/* At the top of the page the hero runs under the bar and a rule would cut it
+   in half for no reason; once anything is scrolling past, the rule is what
+   separates the two. */
+#header.is-scrolled {
+  border-bottom-color: #1e2225;
 }
 
 .header-inner {
@@ -161,7 +257,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 /* No colour here on purpose: `#header a` carries an id, so it would outrank
@@ -173,33 +269,20 @@ body {
 }
 
 .logo {
-  font-family: var(--font-display);
   color: var(--color-white);
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--space-2);
   line-height: 1;
-  /* Orbitron is drawn wide and already spaced; -1px (-.05em at 20px) pulled
-     the glyphs into each other. A hair of positive tracking is what an
-     uppercase display face actually wants. */
-  letter-spacing: .01em;
+  letter-spacing: -1px;
 }
 
 .logo img {
   border-radius: 50%;
 }
 
-/* Orbitron sets very wide. At the header's 20px the avatar plus the wordmark
-   outrun a narrow row and shove the menu button past the right edge, where it
-   cannot be tapped. Fluid below the desktop breakpoint, so the wordmark gives
-   way to the button rather than the other way round; it is back at full size
-   from ~556px up, and the desktop header is untouched. */
-@media (max-width: 991px) {
-  .logo {
-    font-size: clamp(.78rem, 3.6vw, 1.25rem);
-  }
-}
-
+/* Off the spacing scale on purpose: this is optical kerning between the two
+   halves of the wordmark, not layout. */
 .highlight {
   padding-left: 2px;
   color: var(--color-light-green);
@@ -211,7 +294,7 @@ body {
 .navbar {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 .navbar ul {
@@ -219,27 +302,57 @@ body {
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   list-style: none;
 }
 
 .navbar a {
+  position: relative;
   white-space: nowrap;
-  padding: 6px 10px;
+  padding: var(--space-2) var(--space-3);
   display: block;
   color: var(--color-white);
+  transition: color .2s;
 }
 
-.navbar li.active {
-  background-color: var(--color-white);
+/* Scoped to .nav-menu-item, not to every `a` in the navbar: the social icons
+   are in here too, and a rule inset 10px inside their 44px box rendered as a
+   24px dash floating under a 20px glyph, underlining nothing.
+
+   Both states are carried by the rule under the word, never by recolouring the
+   label. At the 72% the header first used, lime text over the light band fell
+   to 3.83:1 -- passing as large text at 20px bold, and only just -- which is
+   what put the colour on the rule. At 90% it would be 7.17:1 and would pass
+   outright, so that argument no longer forces the choice; the rule keeps it
+   because the bar is translucent either way, and this leaves the label's
+   contrast independent of whatever happens to scroll behind it. */
+.navbar .nav-menu-item::after {
+  content: "";
+  position: absolute;
+  inset-inline: var(--space-3);
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+  transition: background-color .2s;
 }
 
-.navbar li.active a {
-  color: var(--color-ink-strong);
+/* There was no hover rule on the nav at all -- the only feedback a pointer got
+   anywhere in the header was the cursor changing. */
+.navbar .nav-menu-item:hover::after {
+  background: rgb(255 255 255 / 45%);
+}
+
+/* The active item used to be a solid white block with black text: heavy enough
+   to read as a pressed button rather than a location. The rule says the same
+   thing quietly, and outranks the hover rule so pointing at the current section
+   does not dim its own marker. */
+.navbar li.active > .nav-menu-item::after,
+.navbar li.active > .nav-menu-item:hover::after {
+  background: var(--color-light-green);
 }
 
 .nav-menu-social {
-  gap: 2px;
+  gap: var(--space-1);
 }
 
 .nav-menu-social a {
@@ -248,8 +361,19 @@ body {
   height: 44px;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
   font-size: 20px;
   color: var(--color-almost-white);
+  transition: background-color .2s;
+}
+
+/* An icon button wants a filled target, not the rule the text items use: inset
+   inside a 44px box that rule came out as a 24px dash under a 20px glyph,
+   underlining nothing. The fill also shows how big the target actually is --
+   44px against a glyph less than half that. Deliberately not lime, which in
+   this header already means "the section you are on". */
+.nav-menu-social a:hover {
+  background: rgb(255 255 255 / 8%);
 }
 
 .mobile-nav-toggle {
@@ -287,10 +411,13 @@ body {
   z-index: 999;
 }
 
+/* Ink, like everything else on the panel -- and on the scale, which this pair
+   of 8px constants had been missed by. */
 .navbar-mobile .mobile-nav-toggle {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: var(--space-2);
+  right: var(--space-2);
+  color: var(--color-ink-strong);
 }
 
 .navbar-mobile > ul {
@@ -305,16 +432,45 @@ body {
   line-height: 2;
 }
 
+/* Ink on lime, not white on lime. This panel is the one place the page still
+   uses the accent as a full field rather than as an accent, and white measured
+   1.87:1 on it -- under the floor even at the 40px these labels are set at.
+   Ink is 9.52:1. The icons below go with them, for the same reason.
+
+   It also left the menu with no active marker at all: `.navbar a` is already
+   white, so the white this rule used to set was a no-op and the current section
+   was indistinguishable from the other two. */
+.navbar-mobile a {
+  color: var(--color-ink-strong);
+}
+
 .navbar-mobile li.active {
   background-color: transparent;
 }
 
-.navbar-mobile li.active a {
-  color: var(--color-white);
+/* Lime on lime cannot show, so the marker is the same rule-under-the-word the
+   desktop header uses, in ink. It has to be repositioned to get there: the
+   shared rule sits at the bottom of the link box, which works against the
+   header's 48px row but falls 40px clear of the word once these items are set
+   at 40px on a doubled line height. Measured from the text instead, the way
+   the project-card links are. */
+.navbar-mobile .nav-menu-item::after {
+  display: none;
+}
+
+.navbar-mobile li.active > .nav-menu-item::after {
+  display: block;
+  top: calc(50% + .62em);
+  bottom: auto;
+  background: var(--color-ink-strong);
+}
+
+.navbar-mobile .nav-menu-social a:hover {
+  background: rgb(20 24 28 / 8%);
 }
 
 .navbar-mobile .nav-menu-social {
-  margin: 0 auto 15px;
+  margin: 0 auto var(--space-4);
   flex-direction: row;
 }
 
@@ -344,8 +500,33 @@ main .section:last-child {
   align-items: center;
 }
 
+/* A kicker over each H2. The headings used to open their sections with nothing
+   above them, so they read as labels rather than as the start of something.
+   Shares the hero eyebrow's proportions deliberately -- same role, same voice --
+   with a short rule to anchor it. */
+.section-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display);
+  font-size: clamp(.72rem, 1vw, .8rem);
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--color-light-green);
+}
+
+.section-kicker::after {
+  content: "";
+  flex: 0 0 2.5rem;
+  height: 2px;
+  background: currentcolor;
+  opacity: .5;
+}
+
 .section h2 {
-  margin: 0 0 2rem;
+  margin: 0 0 var(--space-7);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.9rem, 4.5vw, 2.85rem);
@@ -360,9 +541,18 @@ main .section:last-child {
 /* Body copy stays body-sized. This rule previously carried a clamp up to
    1.5rem, which -- being one specificity step above .project-desc and friends
    -- silently overrode every size set on them and rendered plain sentences at
-   24px. Only .lead is meant to be larger, and it says so itself. */
+   24px. Only .lead is meant to be larger, and it says so itself.
+
+   It carried `margin: 0 0 .75em` for just as long, and that was the same bug
+   wearing a different hat. At (0,1,1) the selector outranks every single-class
+   paragraph rule in the sheet, and it was silently overriding eight of them:
+   .eyebrow and .project-meta/-desc/-links asked for `margin: 0` and got .75em,
+   .section-kicker and .contact-status-kicker asked for a --space value and got
+   .75em, and .hero-cta and .contact-actions asked for a margin-top that never
+   arrived at all. So the rhythm item 34 put on a 4px grid was not the rhythm
+   that rendered. The UA default is cleared by the bare `p` rule in the base
+   now, at a specificity that loses to a class the way it should. */
 .section p {
-  margin: 0 0 .75em;
   /* Roughly 62 characters. Past ~75 the eye loses the line it is returning
      to; the Contact copy was running the full 1140px. */
   max-width: 62ch;
@@ -385,7 +575,7 @@ main .section:last-child {
   min-height: 100dvh;
   display: flex;
   align-items: center;
-  padding-top: calc(var(--header-height) + 2rem);
+  padding-top: calc(var(--header-height) + var(--space-7));
   /* Plain JPEG by default; the @supports block below upgrades browsers that
      can pick a modern codec. Written this way round so a browser without
      image-set() still gets a background rather than none at all. */
@@ -431,14 +621,24 @@ main .section:last-child {
   }
 }
 
+/* The hero's rhythm is set here and nowhere else. It used to be this gap plus
+   whatever .section p added on top, which rendered 22.8 / 12 / 27.6 / 27.6px
+   between the five blocks -- an order nobody chose, off the grid, and with the
+   eyebrow sitting further from the heading it labels than that heading sat from
+   the copy. Chosen now, and on the scale: 16px into the heading, 20px between
+   the two sentences, 32px before the call to action. */
 .hero-copy {
   display: flex;
   flex-direction: column;
-  gap: .85rem;
+  gap: var(--space-4);
+}
+
+.hero-copy .lead {
+  margin-top: var(--space-1);
 }
 
 .hero-cta {
-  margin-top: .75rem;
+  margin-top: var(--space-4);
 }
 
 /* -----------------------------------------------------------------------------
@@ -466,15 +666,15 @@ main .section:last-child {
 .terminal-bar {
   display: flex;
   align-items: center;
-  gap: .75rem;
-  padding: .65rem .9rem;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: rgb(255 255 255 / 4%);
   border-bottom: 1px solid rgb(255 255 255 / 8%);
 }
 
 .terminal-dots {
   display: flex;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .terminal-dots span {
@@ -505,7 +705,7 @@ main .section:last-child {
 
 .terminal-body {
   margin: 0;
-  padding: 1.15rem 1.25rem 1.35rem;
+  padding: var(--space-5) var(--space-5) var(--space-6);
   font-family: var(--font-mono);
   font-size: clamp(.78rem, .95vw, .875rem);
   line-height: 1.8;
@@ -574,17 +774,21 @@ h1 {
   text-wrap: pretty;
 }
 
-/* The old stops were #fc40ff -> #543fff, and the indigo end gave 3.25:1 on the
-   dark surface. That passes as large text on desktop, where .lead reaches
-   20.8px bold, but fails at the mobile clamp floor where the same words render
-   16.8px bold and 4.5:1 is required. These stops are 7.30:1 and 7.11:1, and
-   being lighter they read as the neon the effect is imitating rather than as
-   ink. The violet is the token the hero terminal already uses for this exact
-   phrase. */
-.night-begins-to-shine {
-  background: linear-gradient(to left, var(--color-pink), var(--color-violet));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Violet is reserved for the creative, after-hours thread of the site -- the
+   same role, and the same token, the hero terminal gives this exact phrase. A
+   solid value keeps item 7's promise of one accent better than the gradient it
+   replaced, which needed a second and third colour to say it.
+
+   The selector has to name `strong`. This is a `<strong class=...>` inside
+   `.lead`, and `.lead strong` (0,1,1) already sets the lime; a bare
+   `.night-begins-to-shine` (0,1,0) loses to it, so the phrase rendered in the
+   same lime as the ordinary `<strong>` in the sentence above and the line lost
+   its point entirely. The gradient this replaced never hit that, because
+   `background-clip`/`-webkit-text-fill-color` are properties nothing else in
+   the cascade sets -- swapping it for `color` moved the rule into a contest it
+   was not written to win. */
+strong.night-begins-to-shine {
+  color: var(--color-violet);
 }
 
 /* -----------------------------------------------------------------------------
@@ -592,6 +796,10 @@ h1 {
 ----------------------------------------------------------------------------- */
 .section-projects {
   background-color: var(--color-paper);
+}
+
+.section-projects .section-kicker {
+  color: var(--color-green-ink);
 }
 
 .section-projects h2 {
@@ -605,14 +813,18 @@ h1 {
   display: grid;
   /* auto-fit means the column count follows the viewport with no breakpoints. */
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-  gap: 20px;
+  gap: var(--space-5);
 }
 
+/* The 24px step is what the card rendered all along -- a 12px gap plus the
+   ~12px .section p was adding to every paragraph in it. With the paragraph
+   margins gone the gap carries it on its own, which also puts the title the
+   same distance below the media panel as the card's own side padding. */
 .project-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 22px;
+  gap: var(--space-6);
+  padding: var(--space-6);
   background: var(--color-white);
   border: 1px solid var(--color-hairline);
   border-top: 3px solid var(--color-light-green);
@@ -624,14 +836,6 @@ h1 {
   box-shadow: 0 1px 2px rgb(12 14 16 / 5%);
 }
 
-.project-card-t0d0 {
-  border-top-color: #15ace5;
-}
-
-.project-card-zecret {
-  border-top-color: #fc40ff;
-}
-
 /* A consistent media panel per card. The three screenshots have wildly
    different shapes -- 1:1 pixel art, a 0.71:1 portrait app, a 2.53:1 terminal
    -- so they are contained rather than cropped, on a dark panel that bleeds to
@@ -639,13 +843,41 @@ h1 {
    sliver and cut text off the terminal. */
 .project-media {
   /* Negative margins cancel the card's padding so the panel meets its edges. */
-  margin: -22px -22px 0;
+  margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) 0;
+  /* Matting, and the point of it. The three screenshots are 1:1 pixel art, a
+     0.71:1 portrait and a 2.53:1 terminal, so `contain` left each a different
+     amount of bare panel: bansoko bled to the edges, t0d0 sat in wide pillarbox
+     bars, and zecret -- which happens to be exactly 16:10 -- filled the frame
+     completely. The panels therefore read as three different treatments rather
+     than one. Insetting all three by the same 16px makes the mount deliberate:
+     every screenshot now sits ON the panel instead of one of them being it. */
+  padding: var(--space-4);
   aspect-ratio: 16 / 10;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--color-surface-raised);
+  /* A soft top-down light over a per-project tint, so the mount reads as a lit
+     surface rather than a flat hole cut in the card. Every tint is near-black
+     and simply follows the dominant hue of the screenshot it holds -- these are
+     surfaces, not a reopening of item 7's accent count. */
+  background:
+    linear-gradient(to bottom, rgb(255 255 255 / 5%), rgb(255 255 255 / 0%) 60%),
+    var(--project-tint, var(--color-surface-raised));
+}
+
+/* Deep space indigo, under the starfield the pixel art is set against. */
+.project-card-bansoko {
+  --project-tint: #131627;
+}
+
+.project-card-t0d0 {
+  --project-tint: #111c25;
+}
+
+/* Charcoal with a hint of the terminal's warm accent. */
+.project-card-zecret {
+  --project-tint: #191720;
 }
 
 /* `display: contents` dissolves the <picture> box so the <img> becomes the
@@ -663,6 +895,9 @@ h1 {
   width: auto;
   height: auto;
   object-fit: contain;
+  /* Small enough to read as a mounted screenshot rather than as a rounded
+     component in its own right -- the card is already at 12px. */
+  border-radius: 4px;
 }
 
 /* Bansoko is 256px pixel art: smooth upscaling would turn it to mush. */
@@ -676,7 +911,7 @@ h1 {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .project-head h3 {
@@ -696,7 +931,7 @@ h1 {
 .project-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
   margin: 0;
   font-size: .95rem;
   color: var(--color-ink-soft);
@@ -706,7 +941,7 @@ h1 {
 .project-stars {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .project-desc {
@@ -723,11 +958,11 @@ h1 {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .project-tags li {
-  padding: 3px 10px;
+  padding: var(--space-1) var(--space-3);
   border-radius: 999px;
   background: rgb(20 24 27 / 6%);
   font-size: .8rem;
@@ -739,7 +974,7 @@ h1 {
 .project-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--space-4);
   margin: 0;
   font-size: .95rem;
 }
@@ -749,20 +984,39 @@ h1 {
    colour alone (ink vs green), which read as a hierarchy that was never
    intended. */
 .project-links a {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
   min-height: 44px;
   font-weight: 700;
   text-decoration: none;
   color: var(--color-ink-strong);
-  border-bottom: 2px solid var(--color-ink-strong);
-  transition: color .2s, border-color .2s;
+  transition: color .2s;
+}
+
+/* Drawn against the text rather than against the box. This was a border-bottom,
+   which sits at the bottom edge of the 44px touch target and so floated 14.2px
+   clear of the word -- a detached dash under the link rather than an underline
+   on it. The target is worth keeping at 44px, so the rule came off the box
+   instead: half the line box down, plus .75em, lands just under the descenders
+   and stays there at whatever size the link is set. */
+.project-links a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: calc(50% + .75em);
+  height: 2px;
+  background: var(--color-ink-strong);
+  transition: background-color .2s;
 }
 
 .project-links a:hover {
   color: var(--color-green-ink);
-  border-bottom-color: var(--color-light-green);
+}
+
+.project-links a:hover::after {
+  background: var(--color-light-green);
 }
 
 .project-links .icon {
@@ -778,92 +1032,304 @@ h1 {
 /* -----------------------------------------------------------------------------
  Contact
 ----------------------------------------------------------------------------- */
+/* A night sky, under a scrim, in three layers: scrim, a neutral wash of
+   light, starfield.
+
+   The subject is not decoration picked at random. The hero says "...and when the
+   night begins to shine I become a solo game developer", and this is the one
+   section that names both halves of that -- Work and After hours, in the "At a
+   glance" list beside this copy.
+
+   Its tones are the hero's, so the page opens and closes on the same
+   near-black: the scrim is the hero scrim's rgb(11 13 15), the base is a
+   neutral grey rather than the blue-cast --color-surface-raised, and the light
+   from the top right is white rather than tinted, the way the photograph's
+   light is. It used to carry a violet wash and a lime one, which made it read
+   as a different site from the greyscale hero.
+
+   What it replaces is a 14 kB raster of a stock dark polygonal abstract whose
+   own faint accent was olive-gold -- a fourth colour on a page that had just
+   finished reducing itself to two. That file had also been 856 kB, with a 2.1 MB
+   @2x handed to every retina laptop by an image-set() density descriptor.
+
+   The starfield is generated, not exported: scripts/make-contact-starfield.mjs,
+   deterministic from a seed, 9.4 kB of SVG that gzips to 2.0 kB. Being vector it
+   cannot reacquire the @2x problem, and its density and palette are inputs
+   rather than pixels. No raster companion, and nothing to re-export.
+
+   Every text colour over it is measured against the REAL composited background
+   -- the text hidden, the section screenshotted, the pixels behind each glyph
+   sampled from a canvas rather than assumed flat -- because this is exactly the
+   case item 9 was about. Worst figures, over 1440 / 1280 / 390px:
+
+     lead 18.0:1   dd 18.0:1   kicker 10.0:1   dt 5.9:1   footer 10.3:1
+
+   against a 4.5:1 floor (3:1 for h2 and the lead, which are large). dt is the
+   tightest by some way -- it is --color-grey at 12px, the smallest and faintest
+   thing on the page -- and it is the one to re-measure if this artwork is ever
+   retuned.
+
+   Two notes on method, both learned here. Measure the rects the TEXT occupies
+   (Range.getClientRects) and not the element box: dt is a block in a 495px grid
+   column and its box runs on for 430px of empty space past the word "WORK", so
+   sampling the box reported artwork in the far right of the section as though it
+   were behind a glyph, and produced a spurious 2.81:1. And average over a small
+   neighbourhood rather than taking the single worst pixel: a starfield's worst
+   pixel is a star, and a 1px dot under a 12px glyph is not what the eye
+   integrates. The figures above are the worst 5x5 window mean. */
 .section-contact {
-  background-color: var(--color-surface-raised);
+  background-color: #16181a;
+  background-image:
+    var(--contact-scrim),
+    radial-gradient(72% 82% at 84% -4%, rgb(255 255 255 / 7%), transparent 66%),
+    url('/images/contact-starfield.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .section-contact .lead {
   margin-bottom: 1.5em;
+  /* Narrower than the 62ch body measure and balanced, or the sentence runs the
+     full column and drops a two-character orphan onto the second line. */
+  max-width: 34ch;
   font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  text-wrap: balance;
+  color: var(--color-white);
+}
+
+.contact-layout {
+  display: grid;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+@media (min-width: 992px) {
+  .contact-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(16rem, .9fr);
+  }
+}
+
+.contact-status {
+  padding: var(--space-6) 0 var(--space-6) var(--space-7);
+  border-left: 1px solid rgb(255 255 255 / 14%);
+}
+
+.contact-status-kicker {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: .8rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--color-light-green);
+}
+
+.contact-status dl {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.contact-status dl div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.contact-status dt {
+  font-family: var(--font-display);
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--color-grey);
+}
+
+.contact-status dd {
+  margin: 0;
+  font-size: 1.15rem;
   color: var(--color-white);
 }
 
 /* -----------------------------------------------------------------------------
  Buttons
 ----------------------------------------------------------------------------- */
+/* One fill, one radius, icon inline on a gap. These used to be split two-tone
+   controls -- a darker icon block butted against a lighter label block -- which
+   is a 2015 flat-design pattern, and on the email button it meant a grey slab
+   that read as disabled (item 25) even though its label was passing contrast
+   the whole time. There is no lift on hover: hover movement was tried on the
+   project cards and rejected, so the feedback here is colour only. */
 .button {
   display: inline-flex;
-  align-items: stretch;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid transparent;
+  border-radius: 8px;
   font-family: var(--font-body);
   font-size: 1.125rem;
+  font-weight: 700;
   text-decoration: none;
   color: var(--color-white);
+  transition: background-color .2s, border-color .2s, color .2s;
 }
 
-.button-icon {
+/* One primary per view -- the hero's "see my projects", and the email action,
+   which is the thing this section exists for. */
+.button-primary {
+  background: var(--color-light-green);
+  color: var(--color-ink-strong);
+}
+
+.button-primary:hover {
+  background: var(--color-green-dark);
+}
+
+.contact-actions {
+  margin: var(--space-7) 0 0;
+}
+
+/* Centred, not stretched. .icon-button carries an explicit 44px height so it
+   cannot stretch to match, and the default `normal` alignment left it hanging
+   from the top of a taller row: 10.8px short at desktop, and 39.6px at 320px
+   where the button's label wraps to two lines. */
+.email-controls {
   display: flex;
   align-items: center;
-  padding: 12px;
+  width: min(100%, 31rem);
+  gap: var(--space-2);
 }
 
-.button-label {
-  padding: 12px 16px;
+.email-controls .button {
+  flex: 1;
+  min-width: 0;
 }
 
-.button-icon-projects {
-  background-color: var(--color-green-dark);
+#email {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.button-label-projects {
-  background-color: var(--color-light-green);
-  color: var(--color-ink-strong);
+.icon-button {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+
+.icon-button:hover {
+  border-color: var(--color-light-green);
+  color: var(--color-light-green);
+}
+
+.contact-socials {
+  display: flex;
+  gap: var(--space-5);
+  margin-top: var(--space-4);
+}
+
+.contact-socials a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-body);
   font-weight: 700;
+  text-decoration: none;
+  transition: color .2s;
 }
 
-.button-icon-email {
-  background-color: #424242;
+.contact-socials a:hover {
+  color: var(--color-light-green);
 }
 
-.button-label-email {
-  background-color: #5b5b5b;
+@media (max-width: 991px) {
+  /* No background override here any more. The old one nudged the focal point of
+     a photographic texture that had a subject to keep in frame; a starfield has
+     none, and `cover` on a vector has no edge to show at any size. */
+  .contact-status {
+    padding: var(--space-6) 0 0;
+    border-top: 1px solid rgb(255 255 255 / 14%);
+    border-left: 0;
+  }
 }
 
-.email-visible > .button-icon-email {
-  background-color: #d33b30;
+@media (max-width: 560px) {
+  .email-controls {
+    width: 100%;
+  }
+
+  .email-controls .button {
+    justify-content: center;
+  }
+
+  .contact-socials {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .contact-socials a {
+    justify-content: center;
+  }
 }
 
-.email-visible > .button-label-email {
-  background-color: #ea4335;
+/* -----------------------------------------------------------------------------
+ Motion
+ The page had none at all. This is the whole of it: a short fade up as a block
+ first enters the viewport, once.
+----------------------------------------------------------------------------- */
+/* .has-reveal is set on <html> by app.js, and only after it has established
+   that the visitor has not asked for reduced motion. Hiding these blocks from
+   the stylesheet alone would leave them invisible for good if the JS bundle
+   never arrived -- a missing animation is a far cheaper failure than a missing
+   page, so the hidden state is not allowed to exist without the code that
+   undoes it. */
+.has-reveal .reveal {
+  opacity: 0;
+  transform: translateY(12px);
 }
 
-.button-icon-linkedin {
-  background-color: #149bcc;
-}
-
-.button-label-linkedin {
-  background-color: #15ace5;
+.has-reveal .reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+  /* Decelerating, so the block settles rather than stopping dead. */
+  transition: opacity .5s ease-out, transform .5s cubic-bezier(.22, .61, .36, 1);
+  /* Only the project cards set an index; everything else falls back to 0 and
+     plays immediately. */
+  transition-delay: calc(var(--reveal-index, 0) * 80ms);
 }
 
 /* -----------------------------------------------------------------------------
  Footer
 ----------------------------------------------------------------------------- */
+/* Deliberately NOT given `min-height: var(--footer-height)`. The footer takes
+   its natural height and the token follows it, rather than the other way round;
+   pinning the box to the token would make the measurement circular. */
 #footer {
   background: var(--color-surface);
-  /* Holds the height the last section subtracts. min-height rather than
-     height so a wrapped line still fits; padding keeps the single line
-     centred if the box grows. */
-  min-height: var(--footer-height);
+  border-top: 1px solid rgb(255 255 255 / 7%);
   display: flex;
   align-items: center;
-  padding-block: 22px;
+  padding-block: var(--space-6);
 }
 
 #footer p {
   margin: 0;
   text-align: center;
   font-size: 1rem;
-  /* Was #6a6f72 -- 3.80:1 on the dark surface, under the 4.5:1 floor. The body
-     grey is 5.75:1 and already a token, so the fix costs one fewer magic hex
-     rather than one more. */
+  /* Was #6a6f72 -- 3.80:1 on the dark surface, under the 4.5:1 floor. The muted
+     grey is a token already, so the fix costs one fewer magic hex rather than
+     one more. It measures 6.22:1 here; the 5.75:1 this comment used to quote
+     was the token's old #8c8c8c value and went stale when it was retuned. */
   color: var(--color-grey);
 }

@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Page not found - Krzysztof Furtak</title>
     <meta name="robots" content="noindex">
-    <meta name="theme-color" content="#000">
+    <meta name="theme-color" content="#0b0d0f">
+    <meta name="color-scheme" content="dark">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <!-- Deliberately self-contained: this page lives in public/ and so cannot
          reference the hashed CSS bundle, whose filename changes every build.
          System fonts keep it instant and free of external requests. -->
     <style>
+      /* These are copies of the tokens in src/css/main.css, not references to
+         them: this page lives in public/ and cannot link the hashed CSS
+         bundle. They drifted once already -- the whole set here was still the
+         pre-redesign palette (#000, #86c232, #8c8c8c) long after the site had
+         moved on -- so keep them in step by hand when the tokens change. */
       :root {
-        --black: #000;
-        --dark-grey: #222629;
-        --light-green: #86c232;
+        color-scheme: dark;
+        --surface: #0b0d0f;
+        --ink-strong: #14181c;
+        --light-green: #9acd4a;
         --almost-white: #e0e0e0;
-        --grey: #8c8c8c;
+        --grey: #8a9399;
       }
       html, body { height: 100%; }
       body {
@@ -24,7 +31,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--black);
+        background: var(--surface);
         color: var(--almost-white);
         font-family: "Roboto Condensed", system-ui, -apple-system, sans-serif;
         text-align: center;
@@ -36,14 +43,13 @@
         line-height: 1;
         margin: 0;
         color: var(--light-green);
-        letter-spacing: -.03em;
       }
       p { font-size: 1.15rem; color: var(--grey); margin: 1rem 0 2rem; }
       a {
         display: inline-block;
         padding: .7rem 1.6rem;
         border: 2px solid var(--light-green);
-        border-radius: 3px;
+        border-radius: 8px;
         color: var(--light-green);
         text-decoration: none;
         text-transform: uppercase;
@@ -52,7 +58,7 @@
       }
       a:hover, a:focus-visible {
         background: var(--light-green);
-        color: var(--dark-grey);
+        color: var(--ink-strong);
       }
       a:focus-visible { outline: 2px solid var(--almost-white); outline-offset: 3px; }
       @media (prefers-reduced-motion: reduce) {

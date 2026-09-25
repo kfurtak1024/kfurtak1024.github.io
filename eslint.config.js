@@ -26,6 +26,19 @@ export default [
   },
 
   {
+    // Drives a headless browser, so the bodies of page.evaluate() run in the
+    // page rather than in Node -- the same split the test files have. Scoped to
+    // this one file so that plain Node scripts like verify.mjs keep failing on
+    // a stray `document`.
+    files: ['scripts/make-og-image.mjs'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.node, ...globals.browser }
+    }
+  },
+
+  {
     // Test files run in Node, but the bodies of page.evaluate() run in the
     // browser, so both sets of globals are legitimately in scope.
     files: ['tests/**/*.mjs'],

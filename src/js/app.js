@@ -5,32 +5,69 @@ const select = (el, all = false) =>
 
 /* -----------------------------------------------------------------------------
  Contact email
- The address is injected at build time as base64 -- obfuscation against
- scrapers, not a secret, since it is public on the page once revealed.
+ The address is public once it reaches the browser; base64 only avoids putting
+ it verbatim in the source. Make the primary contact action direct instead of
+ adding an unnecessary reveal click.
 ----------------------------------------------------------------------------- */
-function revealEmail(e) {
-  const link = select('#email-button')
-  if (link.classList.contains('email-visible')) {
-    return
-  }
-
-  e.preventDefault()
-
-  let email
+function getEmail() {
   try {
-    email = atob(import.meta.env.VITE_SITE_EMAIL_BASE64)
+    const email = atob(import.meta.env.VITE_SITE_EMAIL_BASE64).trim()
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
   } catch {
-    // Missing or malformed value: leave the button reading "Show email"
-    // rather than revealing something broken.
-    return
+    return null
   }
-
-  select('#email').textContent = email
-  link.href = `mailto:${email}`
-  link.classList.add('email-visible')
 }
 
-select('#email-button').addEventListener('click', revealEmail)
+const email = getEmail()
+const emailLink = select('#email-button')
+const copyEmailButton = select('#copy-email')
+const emailCopyStatus = select('#email-copy-status')
+
+if (email) {
+  select('#email').textContent = email
+  emailLink.href = `mailto:${email}`
+  copyEmailButton.classList.remove('hidden')
+}
+
+async function copyEmailAddress(value) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(value)
+      return true
+    } catch {
+      // Clipboard access is restricted on some HTTP and embedded contexts.
+    }
+  }
+
+  const field = document.createElement('textarea')
+  field.value = value
+  field.setAttribute('readonly', '')
+  field.style.position = 'fixed'
+  field.style.opacity = '0'
+  document.body.append(field)
+  field.select()
+  const copied = document.execCommand('copy')
+  field.remove()
+  return copied
+}
+
+copyEmailButton.addEventListener('click', async () => {
+  if (!email) return
+
+  if (await copyEmailAddress(email)) {
+    select('.copy-icon').classList.add('hidden')
+    select('.check-icon').classList.remove('hidden')
+    copyEmailButton.setAttribute('aria-label', 'Email address copied')
+    emailCopyStatus.textContent = 'Email address copied to clipboard.'
+    window.setTimeout(() => {
+      select('.copy-icon').classList.remove('hidden')
+      select('.check-icon').classList.add('hidden')
+      copyEmailButton.setAttribute('aria-label', 'Copy email address')
+    }, 2000)
+  } else {
+    emailCopyStatus.textContent = 'Could not copy the email address.'
+  }
+})
 
 /* -----------------------------------------------------------------------------
  Mobile menu
@@ -38,11 +75,23 @@ select('#email-button').addEventListener('click', revealEmail)
 const navbar = select('#navbar')
 const toggle = select('.mobile-nav-toggle')
 
+// Everything the open menu covers. The overlay hides these from the pointer,
+// but not from the keyboard: tabbing past the last link in the menu walked
+// straight out into the page underneath, where the focus ring is invisible
+// behind an opaque lime panel. `inert` takes the subtrees out of the tab order
+// and out of the accessibility tree for exactly as long as the menu is up.
+// The toggle itself is inside .navbar, so it stays reachable.
+const behindMenu = [select('#main'), select('#footer'), select('.logo')]
+
 function setMobileMenu(open) {
   navbar.classList.toggle('navbar-mobile', open)
   toggle.setAttribute('aria-expanded', String(open))
   select('.mobile-nav-toggle .icon', true)
     .forEach((icon, index) => icon.classList.toggle('hidden', index === (open ? 0 : 1)))
+  for (const part of behindMenu) part.toggleAttribute('inert', open)
+  // Without this the page scrolls behind the overlay, so closing the menu
+  // returns you somewhere other than where you opened it.
+  document.body.classList.toggle('menu-is-open', open)
 }
 
 toggle.addEventListener('click', () => {
@@ -61,9 +110,9 @@ document.addEventListener('keydown', (event) => {
 
 /* -----------------------------------------------------------------------------
  Scroll spy
- Marks the section currently in view as active, in the header menu and in the
- desktop dot navigation. Replaces fullPage.js's onLeave/afterRender callbacks;
- scrolling itself is now the browser's, driven by the anchors in the markup.
+ Marks the section currently in view as active in the header menu. Replaces
+ fullPage.js's onLeave/afterRender callbacks; scrolling itself is now the
+ browser's, driven by the anchors in the markup.
 ----------------------------------------------------------------------------- */
 const sections = select('main .section', true)
 const navLinks = select('#nav-menu a.nav-menu-item', true)
@@ -78,7 +127,6 @@ function setActiveSection(id) {
       link.removeAttribute('aria-current')
     }
   }
-
 }
 
 // The active section is whichever one covers a band just below the header.
@@ -115,6 +163,38 @@ function updateActiveSection() {
   if (winner) setActiveSection(winner)
 }
 
+/* -----------------------------------------------------------------------------
+ Footer height
+ The last section is sized to leave exactly enough room for the footer, so that
+ arriving at Contact puts the footer's bottom edge on the viewport's. That means
+ the stylesheet needs the footer's real height, which no constant can predict --
+ it changes with the viewport, with where the colophon wraps, and once more when
+ the webfont loads. Measured and published instead. The CSS carries fallback
+ values for the no-JS case.
+----------------------------------------------------------------------------- */
+const footer = select('#footer')
+
+function publishFooterHeight() {
+  document.documentElement.style.setProperty('--footer-height', `${footer.offsetHeight}px`)
+}
+
+publishFooterHeight()
+
+// Catches viewport changes, reflow when the colophon rewraps, and the reflow
+// after the webfont swaps in -- all of which a one-shot measurement misses.
+if ('ResizeObserver' in window) {
+  new ResizeObserver(publishFooterHeight).observe(footer)
+}
+
+// The header's bottom rule only earns its keep once something is passing under
+// it; at the top of the page it would cut the hero in half. The threshold is a
+// few pixels rather than 0 so a rubber-band overscroll does not flicker it.
+const header = select('#header')
+
+function updateHeaderState() {
+  header.classList.toggle('is-scrolled', window.scrollY > 4)
+}
+
 let scrollQueued = false
 window.addEventListener('scroll', () => {
   if (scrollQueued) return
@@ -122,14 +202,74 @@ window.addEventListener('scroll', () => {
   window.requestAnimationFrame(() => {
     scrollQueued = false
     updateActiveSection()
+    updateHeaderState()
   })
 }, { passive: true })
 
 window.addEventListener('resize', updateActiveSection, { passive: true })
 updateActiveSection()
+updateHeaderState()
 
 // Choosing a destination closes the mobile menu.
 select('#nav-menu a.nav-menu-item', true)
   .forEach((link) => link.addEventListener('click', () => setMobileMenu(false)))
+
+/* -----------------------------------------------------------------------------
+ Reveal on scroll
+ The page had no motion of any kind. This is the restrained version: a short
+ fade up as a block enters the viewport, once, and never again.
+
+ The hidden state is applied from HERE rather than from the stylesheet -- app.js
+ adds .has-reveal to <html> before marking anything. A stylesheet that hid these
+ blocks on its own would leave them permanently invisible if the bundle failed
+ to load, which trades a missing animation for a missing page.
+
+ The hero is deliberately not in the list: it is above the fold, so it would
+ only ever be seen fading in over its own first paint.
+----------------------------------------------------------------------------- */
+const REVEALED = [
+  '.section-projects .section-kicker',
+  '.section-projects h2',
+  '.project-card',
+  '.section-contact .section-kicker',
+  '.section-contact h2',
+  '.contact-primary',
+  '.contact-status'
+].join(', ')
+
+// Read once at load. The global reduced-motion rule in the stylesheet collapses
+// transition-duration to .01ms, which would technically do the job -- but not
+// adding the class at all means the elements are never hidden in the first
+// place, so there is no window in which a mis-fired observer could leave one
+// blank.
+if ('IntersectionObserver' in window &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const targets = select(REVEALED, true)
+
+  if (targets.length) {
+    document.documentElement.classList.add('has-reveal')
+
+    for (const el of targets) el.classList.add('reveal')
+
+    // Only the cards stagger, and only against their own row. Indexing every
+    // target instead would hand the Contact block a delay measured from the top
+    // of the Projects section, so it would still be fading in well after it had
+    // finished arriving.
+    select('.project-card', true)
+      .forEach((card, i) => card.style.setProperty('--reveal-index', i))
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        entry.target.classList.add('is-revealed')
+        // One-way: nothing re-hides on the way back up, and each element stops
+        // being watched the moment it has played.
+        observer.unobserve(entry.target)
+      }
+    }, { rootMargin: '0px 0px -8% 0px' })
+
+    for (const el of targets) observer.observe(el)
+  }
+}
 
 select('#copyright-year').textContent = new Date().getFullYear().toString()

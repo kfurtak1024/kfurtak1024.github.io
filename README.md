@@ -58,6 +58,19 @@ The supported Node version is declared as `engines` in [`package.json`](package.
 
 Run `npm run build` before `npm test` or `npm run lint` — both inspect the built output rather than the sources.
 
+### Generated artwork
+
+Two images in [`public/images/`](public/images) are produced by scripts rather than exported by hand. Both are **committed**, and neither runs as part of `npm run build` — a deploy should not depend on shelling out to a headless browser. Re-run them by hand when the palette or the copy they carry changes.
+
+| Command | Produces |
+| --- | --- |
+| `node scripts/make-og-image.mjs` | `og-image.jpg` — the 1200×630 card social platforms show when the site is linked |
+| `node scripts/make-contact-starfield.mjs` | `contact-starfield.svg` — the texture under the Contact section |
+
+The starfield is deterministic: same seed, same bytes, so re-running it produces no diff unless you changed something. It is 9.4 kB that gzips to 2.0 kB.
+
+The OG card renders in the site's real fonts, pulled out of `node_modules` and inlined as `data:` URIs — a page built with `setContent()` has no origin and Chromium silently refuses to load `file://` subresources into it, so the script asserts both faces actually loaded before it screenshots. It is the largest file in the build at 58 kB, but no visitor ever downloads it; only scrapers do.
+
 ### Configuration
 
 One value is injected at build time and read from the environment by Vite:

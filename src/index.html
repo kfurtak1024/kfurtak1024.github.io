@@ -6,14 +6,25 @@
     <title>Krzysztof Furtak - Software Engineer</title>
     <meta name="description" content="The home of my projects and my business card">
     <meta name="author" content="Krzysztof Furtak">
-    <meta name="theme-color" content="#000">
+    <meta name="theme-color" content="#0b0d0f">
     <meta name="color-scheme" content="dark">
     <meta property="og:title" content="Krzysztof Furtak - Software Engineer">
     <meta property="og:locale" content="en_US">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://krzysztoffurtak.dev">
     <meta property="og:description" content="The home of my projects and my business card">
-    <meta property="og:image" content="/images/avatar.png">
+    <!-- Absolute, because the Open Graph spec asks for it and several scrapers
+         will not resolve a root-relative og:image against the page. 1200x630 is
+         the ratio LinkedIn, Facebook and X all render without cropping; this
+         used to point at avatar.png, a square, which they letterboxed by
+         cutting the top and bottom off the face. -->
+    <meta property="og:image" content="https://krzysztoffurtak.dev/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Krzysztof Furtak - software engineer. Java enterprise applications by day, indie games after hours.">
+    <!-- Without this X renders the small square summary card and ignores the
+         1.91:1 image entirely. Everything else it needs it takes from og:*. -->
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="canonical" href="https://krzysztoffurtak.dev/">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -72,13 +83,11 @@
             <p class="lead">I'm a <strong>software engineer</strong> specializing in building Java based enterprise applications.</p>
             <p class="lead">... and when the night begins to shine I become a solo <strong class="night-begins-to-shine">game developer</strong>.</p>
             <p class="hero-cta">
-              <a href="#section-projects" class="button">
-                <span class="button-icon button-icon-projects">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon">
-                    <use href="#arrow-down-icon"/>
-                  </svg>
-                </span>
-                <span class="button-label button-label-projects">See my projects</span>
+              <a href="#section-projects" class="button button-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon">
+                  <use href="#arrow-down-icon"/>
+                </svg>
+                See my projects
               </a>
             </p>
           </div>
@@ -108,9 +117,10 @@ bansoko/  t0d0/  zecret/
 
       <section id="section-projects" class="section section-projects">
         <div class="container">
+          <p class="section-kicker">01 &mdash; Selected work</p>
           <h2>Projects</h2>
           <ul class="project-grid">
-            <li class="project-card">
+            <li class="project-card project-card-bansoko">
               <div class="project-media project-media-pixel">
                 <img src="/images/projects/bansoko.png" width="256" height="256"
                      alt="Bansoko gameplay: a level of crates and targets rendered in 8-bit pixel art"
@@ -229,30 +239,60 @@ bansoko/  t0d0/  zecret/
 
       <section id="section-contact" class="section section-contact">
         <div class="container">
+          <p class="section-kicker">02 &mdash; Get in touch</p>
           <h2>Contact</h2>
-          <p class="lead">Feel free to leave me a <strong>message</strong>!</p>
-          <p>If you want to contact me directly, send me an email:</p>
-          <p>
-            <a id="email-button" href="/" class="button">
-              <span class="button-icon button-icon-email">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
-                  <use href="#email-icon"/>
-                </svg>
-              </span>
-              <span id="email" class="button-label button-label-email">Show email</span>
-            </a>
-          </p>
-          <p>For professional purposes, please use my LinkedIn profile:</p>
-          <p>
-            <a href="https://www.linkedin.com/in/krzysztoffurtak" target="_blank" rel="noopener noreferrer" class="button">
-              <span class="button-icon button-icon-linkedin">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
-                  <use href="#linkedin-icon"/>
-                </svg>
-              </span>
-              <span class="button-label button-label-linkedin">LinkedIn</span>
-            </a>
-          </p>
+          <div class="contact-layout">
+            <div class="contact-primary">
+              <p class="lead">Have a question, an opportunity, or want to say hello? Reach out.</p>
+              <p class="contact-actions">
+                <span class="email-controls">
+                  <a id="email-button" href="#email-button" class="button button-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                      <use href="#email-icon"/>
+                    </svg>
+                    <span id="email">Email me</span>
+                  </a>
+                  <button id="copy-email" type="button" class="icon-button hidden" aria-label="Copy email address" title="Copy email address">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon copy-icon">
+                      <use href="#copy-icon"/>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon check-icon hidden">
+                      <use href="#check-icon"/>
+                    </svg>
+                  </button>
+                </span>
+              </p>
+              <nav class="contact-socials" aria-label="Professional profiles">
+                <a href="https://www.linkedin.com/in/krzysztoffurtak" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
+                    <use href="#linkedin-icon"/>
+                  </svg>
+                  LinkedIn
+                </a>
+                <a href="https://github.com/kfurtak1024" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
+                    <use href="#github-icon"/>
+                  </svg>
+                  GitHub
+                </a>
+              </nav>
+              <span id="email-copy-status" class="sr-only" aria-live="polite"></span>
+            </div>
+
+            <aside class="contact-status" aria-label="At a glance">
+              <p class="contact-status-kicker">At a glance</p>
+              <dl>
+                <div>
+                  <dt>Work</dt>
+                  <dd>Java enterprise applications</dd>
+                </div>
+                <div>
+                  <dt>After hours</dt>
+                  <dd>Indie games and developer tools</dd>
+                </div>
+              </dl>
+            </aside>
+          </div>
         </div>
       </section>
     </main>
@@ -278,6 +318,12 @@ bansoko/  t0d0/  zecret/
       </symbol>
       <symbol id="email-icon" viewBox="0 0 512 512">
         <path d="M0 128C0 92.65 28.65 64 64 64H448C483.3 64 512 92.65 512 128V384C512 419.3 483.3 448 448 448H64C28.65 448 0 419.3 0 384V128zM48 128V150.1L220.5 291.7C241.1 308.7 270.9 308.7 291.5 291.7L464 150.1V127.1C464 119.2 456.8 111.1 448 111.1H64C55.16 111.1 48 119.2 48 127.1L48 128zM48 212.2V384C48 392.8 55.16 400 64 400H448C456.8 400 464 392.8 464 384V212.2L322 328.8C283.6 360.3 228.4 360.3 189.1 328.8L48 212.2z"/>
+      </symbol>
+      <symbol id="copy-icon" viewBox="0 0 448 512">
+        <path d="M384 336H192c-35.3 0-64-28.7-64-64V80c0-35.3 28.7-64 64-64h192c35.3 0 64 28.7 64 64v192c0 35.3-28.7 64-64 64zM192 64c-8.8 0-16 7.2-16 16v192c0 8.8 7.2 16 16 16h192c8.8 0 16-7.2 16-16V80c0-8.8-7.2-16-16-16H192zM272 432v16c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V256c0-8.8 7.2-16 16-16h16v-48H64c-35.3 0-64 28.7-64 64v192c0 35.3 28.7 64 64 64h192c35.3 0 64-28.7 64-64v-16h-48z"/>
+      </symbol>
+      <symbol id="check-icon" viewBox="0 0 448 512">
+        <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7l233.4-233.3c12.5-12.5 32.8-12.5 45.3 0z"/>
       </symbol>
       <symbol id="star-icon" viewBox="0 0 576 512">
         <path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2-137.1 73.2c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L36.8 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L272 13.5C276 5.2 284.4 0 293.6 0h-5.7z"/>

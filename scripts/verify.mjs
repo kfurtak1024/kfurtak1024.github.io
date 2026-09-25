@@ -16,6 +16,8 @@ const EXPECTED = [
   'images/avatar.png',
   'images/intro_background.jpg',
   'images/intro_background.avif', 'images/intro_background.webp',
+  'images/contact-starfield.svg',
+  'images/og-image.jpg',
   'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png',
   'apple-touch-icon.png',
   'android-chrome-192x192.png', 'android-chrome-512x512.png'
@@ -63,6 +65,12 @@ async function readDevFallbacks() {
   if (!values.length) fail('no VITE_* dev fallback values found in .env');
   return values;
 }
+
+// Where this site is actually served. Referencing it absolutely from its own
+// markup is legitimate (og:image, canonical), and checkReferences maps such
+// URLs back onto dist/ so they stay covered by the same guarantees as a
+// relative path.
+const SITE_ORIGIN = 'https://krzysztoffurtak.dev';
 
 const TEXT_EXT = /\.(html|css|js|json|webmanifest)$/;
 const errors = [];
@@ -115,12 +123,21 @@ async function checkForbiddenTokens(files) {
 // the target actually exists. This is what catches a renamed or no-longer-
 // copied asset, the failure mode that produces a build-green/site-broken deploy.
 async function checkReferences(files) {
+  // An absolute URL pointing at this very site is a local reference wearing a
+  // different hat, and it has to be treated as one or it falls through BOTH
+  // halves of the check: this function would skip it as external, and
+  // checkOrphanAssets would then report the file it names as unreferenced.
+  // og:image is the case that forces the issue -- the spec asks for an absolute
+  // URL there and several scrapers will not resolve a relative one.
+  const isSelf = (u) => u === SITE_ORIGIN || u.startsWith(`${SITE_ORIGIN}/`);
+
   const isLocal = (u) =>
-    u && !/^(https?:)?\/\//.test(u) && !u.startsWith('data:') &&
-    !u.startsWith('mailto:') && !u.startsWith('#');
+    u && !u.startsWith('data:') && !u.startsWith('mailto:') &&
+    !u.startsWith('#') && (isSelf(u) || !/^(https?:)?\/\//.test(u));
 
   const resolveRef = (fromFile, url) => {
-    const clean = url.split(/[?#]/)[0];
+    const path = isSelf(url) ? url.slice(SITE_ORIGIN.length) || '/' : url;
+    const clean = path.split(/[?#]/)[0];
     if (clean === '' ) return null;
     return clean.startsWith('/')
       ? join(DIST, clean)
@@ -133,6 +150,18 @@ async function checkReferences(files) {
     if (f.endsWith('.html')) {
       for (const m of text.matchAll(/\b(?:src|href)\s*=\s*"([^"]*)"/g)) {
         refs.push([f, m[1]]);
+      }
+      // srcset carries a comma-separated candidate list, each an URL with an
+      // optional width or density descriptor -- so it matches neither the
+      // src/href sweep above nor a plain attribute read. Every <picture> on
+      // this page offers its modern format that way, which means the AVIF a
+      // browser actually prefers was invisible to this check: a broken or
+      // no-longer-copied one would have shipped silently.
+      for (const m of text.matchAll(/\bsrcset\s*=\s*"([^"]*)"/g)) {
+        for (const candidate of m[1].split(',')) {
+          const url = candidate.trim().split(/\s+/)[0];
+          if (url) refs.push([f, url]);
+        }
       }
       // og:image and friends carry their URL in `content`, so they are invisible
       // to the src/href sweep above -- a broken social preview image would ship
@@ -154,6 +183,7 @@ async function checkReferences(files) {
     }
   }
 
+  const reached = new Set();
   for (const [from, url] of refs) {
     if (!isLocal(url)) continue;
     const target = resolveRef(from, url);
@@ -162,11 +192,33 @@ async function checkReferences(files) {
       const s = await stat(target);
       // A bare "/" legitimately resolves to the directory holding index.html.
       if (s.isDirectory()) await stat(join(target, 'index.html'));
+      else reached.add(target);
     } catch {
       fail(`broken reference "${url}" in ${relative(DIST, from)}`);
     }
   }
-  return refs.length;
+  return { count: refs.length, reached };
+}
+
+// Files that are reached by convention rather than by a reference: the entry
+// document, the 404 GitHub Pages serves by name, and the files a browser or a
+// crawler asks for at a fixed path.
+const UNREFERENCED_BY_DESIGN = new Set([
+  'index.html', '404.html', 'CNAME', 'robots.txt', 'sitemap.xml', 'favicon.ico'
+]);
+
+// The mirror image of checkReferences: that one catches a reference with no
+// file, this one catches a file with no reference. Both are silent failures on
+// a static host -- nothing 404s, the build stays green -- but they cost
+// differently. An orphan is pure payload: two unused background images once
+// shipped 3.85 MB, more than half the deployed site, and the only way to notice
+// was to look at dist/ by hand.
+function checkOrphanAssets(files, reached) {
+  for (const f of files) {
+    const rel = relative(DIST, f).split(sep).join('/');
+    if (UNREFERENCED_BY_DESIGN.has(rel) || reached.has(f)) continue;
+    fail(`orphan asset: ${rel} is in the build but nothing references it`);
+  }
 }
 
 // The email is injected as base64 and decoded in the browser. Scanning for
@@ -222,7 +274,8 @@ const files = await walk(DIST);
 await checkExpectedFiles();
 checkBundles(files);
 await checkForbiddenTokens(files);
-const refCount = await checkReferences(files);
+const { count: refCount, reached } = await checkReferences(files);
+checkOrphanAssets(files, reached);
 await checkInjectedEmail(requireReal, files);
 
 if (errors.length) {
