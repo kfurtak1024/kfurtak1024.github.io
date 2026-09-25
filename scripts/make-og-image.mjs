@@ -1,4 +1,4 @@
-/* Renders public/images/og-image.png -- the 1200x630 card social platforms show
+/* Renders public/images/og-image.jpg -- the 1200x630 card social platforms show
  * when the site is linked.
  *
  * This is a generator rather than a hand-made export so the card cannot drift
@@ -36,11 +36,12 @@ const dataUri = async (path, mime) =>
 const fontUri = (pkg, file) =>
   dataUri(join('node_modules', pkg, 'files', file), 'font/woff2');
 
-const [orbitron, robotoCondensed, avatar] = await Promise.all([
+const [orbitron, robotoCondensed, avatar, photo] = await Promise.all([
   fontUri('@fontsource-variable/orbitron', 'orbitron-latin-wght-normal.woff2'),
   fontUri('@fontsource-variable/roboto-condensed',
           'roboto-condensed-latin-wght-normal.woff2'),
-  dataUri('public/images/avatar.png', 'image/png')
+  dataUri('public/images/avatar.png', 'image/png'),
+  dataUri('public/images/intro_background.jpg', 'image/jpeg')
 ]);
 
 const html = `<!DOCTYPE html>
@@ -87,20 +88,14 @@ const html = `<!DOCTYPE html>
     -webkit-font-smoothing: antialiased;
   }
 
-  /* The same two ideas the Contact section uses: a faint engineering grid and
-     a single lime glow. Nothing here is an image file. */
-  .grid, .glow { position: absolute; inset: 0; }
-  .grid {
-    background-image:
-      linear-gradient(to right, rgb(255 255 255 / 4%) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 4%) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(90% 120% at 88% 20%, #000 0%, transparent 72%);
-  }
-  .glow {
+  /* The hero's own photograph under the hero's own scrim, so the card looks
+     like the page it links to. */
+  .photo {
+    position: absolute;
+    inset: 0;
     background:
-      radial-gradient(46% 62% at 92% 12%, rgb(154 205 74 / 15%), transparent 70%),
-      radial-gradient(40% 55% at 76% 96%, rgb(167 139 250 / 11%), transparent 70%);
+      linear-gradient(to right, rgb(11 13 15 / 93%) 0%, rgb(11 13 15 / 80%) 50%, rgb(11 13 15 / 58%) 100%),
+      url("${photo}") center / cover no-repeat;
   }
 
   .content { position: relative; }
@@ -133,16 +128,16 @@ const html = `<!DOCTYPE html>
     color: var(--white);
   }
 
-  .roles { font-size: 33px; line-height: 1.45; max-width: 22ch; }
+  .roles { font-size: 33px; line-height: 1.45; max-width: 34ch; }
   .roles strong { font-weight: 700; color: var(--light-green); }
   .roles .after-hours { font-weight: 700; color: var(--violet); }
 
   .avatar {
     position: absolute;
-    top: 66px;
+    top: 72px;
     right: 88px;
-    width: 96px;
-    height: 96px;
+    width: 148px;
+    height: 148px;
     border-radius: 50%;
     border: 2px solid rgb(255 255 255 / 12%);
   }
@@ -161,15 +156,14 @@ const html = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-  <div class="grid"></div>
-  <div class="glow"></div>
+  <div class="photo"></div>
   <img class="avatar" src="${avatar}" alt="">
   <div class="content">
     <p class="eyebrow">Software Engineer</p>
   </div>
   <h1 class="content">Krzysztof<br>Furtak</h1>
   <p class="roles content">
-    <strong>Java</strong> enterprise applications by day,
+    <strong>Java</strong> enterprise applications by day,<br>
     <span class="after-hours">indie games</span> after hours.
   </p>
   <p class="domain">krzysztoffurtak.dev</p>

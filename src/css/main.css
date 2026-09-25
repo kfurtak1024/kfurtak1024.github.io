@@ -1209,15 +1209,17 @@ strong.night-begins-to-shine {
    cannot stretch to match, and the default `normal` alignment left it hanging
    from the top of a taller row: 10.8px short at desktop, and 39.6px at 320px
    where the button's label wraps to two lines. */
+/* Sized to the address rather than stretched: a wide green bar with the text
+   at its left edge reads as an input field, not a button. */
 .email-controls {
   display: flex;
   align-items: center;
-  width: min(100%, 31rem);
+  max-width: 100%;
   gap: var(--space-2);
 }
 
 .email-controls .button {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -1284,6 +1286,7 @@ strong.night-begins-to-shine {
   }
 
   .email-controls .button {
+    flex: 1;
     justify-content: center;
   }
 
