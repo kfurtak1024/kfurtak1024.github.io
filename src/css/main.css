@@ -4,13 +4,11 @@
  Tokens
 ----------------------------------------------------------------------------- */
 :root {
-  /* Dark surfaces. Near-black rather than #000: pure black halates against
-     white text and reads as an unmade decision rather than a chosen colour. */
+  /* Dark surfaces: near-black rather than #000, which halates against white text. */
   --color-surface: #0b0d0f;
   --color-surface-raised: #14181c;
 
-  /* The one light surface. A warm off-white rather than the flat #e0e0e0 it
-     replaces, which looked like an unstyled backdrop between two dark bands. */
+  /* The one light surface, behind the project cards. */
   --color-paper: #f7f7f3;
 
   --color-white: #fff;
@@ -22,17 +20,11 @@
   --color-body: #b7bec2;
   --color-almost-white: #e0e0e0;
 
-  /* Ink -- text ON the light surface. Near-black for the same reason the
-     surfaces are: #000 on off-white is harsher than anything in print. */
+  /* Ink: text on the light surface. */
   --color-ink-strong: #14181c;
   --color-ink: #3d4245;
   --color-ink-soft: #5c6266;
-  /* Warm-neutral, not green. #c9cdc4 had G above both R and B, which read
-     muddy beside the neutral greys; the paper it sits on is warm (R>G>B), so
-     the hairline follows that bias rather than opposing it. Same lightness as
-     before -- the complaint was the cast, not the strength, and the backlog's
-     suggested #d7d7d4 would have lightened the card border by a third. Used in
-     exactly one place now: the project card. */
+  /* Card border. Warm-neutral, to match the warm paper it sits on. */
   --color-hairline: #c9c8c5;
 
   --font-display: "Orbitron Variable", "Orbitron", sans-serif;
@@ -40,28 +32,13 @@
   --font-mono: ui-monospace, sfmono-regular, "SF Mono", menlo, consolas, monospace;
 
   --hero-scrim: linear-gradient(to right, rgb(11 13 15 / 93%) 0%, rgb(11 13 15 / 80%) 50%, rgb(11 13 15 / 58%) 100%);
-  /* Same idea as the hero scrim and deliberately the same construction, so the
-     page has one technique for putting text over artwork rather than two. It is
-     tuned the other way round though: the hero is a photograph that should still
-     read as one, while this sits under the section's own copy.
-
-     The stops are placed off the layout rather than by eye, and the layout was
-     re-measured rather than taken from the previous comment here, which had gone
-     stale: it said the copy column ends at 41% and the "At a glance" column at
-     73%. Measured at 1440px they are 52% and 90%. What actually matters is where
-     the GLYPHS stop, since the columns are much wider than their text -- dt ends
-     at 61%, dd at 71%, the lead at 37% -- so the ramp holds near-opaque to ~62%,
-     eases to 76%, and only opens up over the last quarter, which carries no text
-     at any viewport. The previous curve held 88% all the way to 75% and hid the
-     artwork almost entirely: 14 kB of something nobody could see. */
+  /* Same construction as the hero scrim, but tuned to sit under text: near-opaque
+     up to ~62% (where the Contact copy's glyphs end at 1440px), then opening up
+     over the last quarter, which carries no text at any viewport. */
   --contact-scrim: linear-gradient(to right, rgb(11 13 15 / 96%) 0%, rgb(11 13 15 / 88%) 34%, rgb(11 13 15 / 55%) 62%, rgb(11 13 15 / 22%) 100%);
 
-  /* Spacing scale, 4px base. Before this the sheet carried 2, 3, 6, 7, 10, 12,
-     15, 16, 20, 22 and 24px plus .6rem, .65rem, .75rem, .85rem, .9rem, 1.15rem,
-     1.25rem and 1.35rem -- values chosen one at a time, so nothing lined up
-     with anything else. Fluid clamps and em-relative typographic margins are
-     deliberately NOT on this scale: they answer to the viewport and to the
-     font, not to the layout grid. */
+  /* Spacing scale, 4px base. Fluid clamps and em-relative typographic margins are
+     deliberately not on it: they follow the viewport and the font, not the grid. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -72,26 +49,15 @@
   --space-8: 40px;
 
   --header-height: 60px;
-  /* Where an anchored section comes to rest, and the height the last one has
-     to give up. One token for both, so they cannot drift apart and reopen a
-     gap between them.
-
-     It is deliberately 1px INSIDE what the header covers (its 60px row plus a
-     1px bottom border, which --header-height excludes -- that is a min-height
-     on the inner row). Chromium rounds the maximum scroll offset DOWN to a
-     whole pixel, so a document with a fractional height -- this one is
-     2537.1875px, the fraction coming from the projects grid -- can never quite
-     reach its end and stops up to 1px short. Landing flush with the header
-     would leave that shortfall showing as a sliver of the OUTGOING section
-     under the bar: a pale band of the Projects paper as you arrive at the dark
-     Contact. Overlapping by a pixel hides a residue that is always < 1px by
-     construction, and costs only a pixel of section padding nobody can see. */
+  /* Where an anchored section comes to rest, and the height the last section gives
+     up -- one token so the two cannot drift apart. Chromium rounds the maximum
+     scroll offset down to a whole pixel, so a document with a fractional height
+     can stop up to 1px short of its end; ending the offset exactly at the header's
+     edge (60px row, excluding its 1px border) lets the header cover that sliver
+     instead of showing a line of the previous section under it. */
   --header-offset: var(--header-height);
-  /* How much room the last section gives up so the footer lands inside the
-     viewport. app.js overwrites this with the footer's measured height and
-     keeps it current through a ResizeObserver; these values are the no-JS
-     fallback, and are only approximately right -- the footer's real height
-     can change with the viewport and with the webfont. */
+  /* Room the last section leaves for the footer. app.js replaces this with the
+     footer's measured height; this is the no-JS fallback. */
   --footer-height: 4.5rem;
   --content-width: 1140px;
 
@@ -105,11 +71,7 @@
 }
 
 html {
-  /* Anchor jumps stop just under the fixed header -- see --header-offset for
-     why "just under" rather than flush. An earlier extra 1rem of breathing
-     room here left a much larger sliver of the outgoing section on show, and
-     was redundant besides: every section carries several rem of its own
-     padding, so a landing heading was never flush to begin with. */
+  /* Anchor jumps stop just under the fixed header (see --header-offset). */
   scroll-padding-top: var(--header-offset);
   scroll-behavior: smooth;
 }
@@ -132,19 +94,15 @@ body {
   background: var(--color-surface);
   color: var(--color-body);
   font-family: var(--font-body);
-  /* 17px. A condensed face sets narrower than a normal one at the same size,
-     so it needs the extra pixel more, not less, to hold a comfortable
-     reading size. */
+  /* 17px: a condensed face needs the extra pixel to read comfortably. */
   font-size: 1.0625rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizelegibility;
 }
 
-/* Paragraph spacing belongs to whichever rule owns the paragraph. This clears
-   the UA default at element specificity (0,0,1), so it loses to every class
-   rule in the sheet -- which is the whole point of putting it here rather than
-   on `.section p`, where the same declaration outranked them instead. */
+/* Clears the UA paragraph margin at element specificity, so any class rule that
+   sets a margin wins. */
 p {
   margin: 0;
 }
@@ -164,10 +122,8 @@ p {
   display: none;
 }
 
-/* The mobile menu is a fixed, opaque, full-screen panel. Without this the
-   document underneath still scrolls behind it, so closing the menu drops you
-   somewhere other than where you opened it. Set from app.js alongside the
-   `inert` it puts on everything the overlay covers. */
+/* Set by app.js while the full-screen mobile menu is open, so the page does not
+   scroll underneath it. */
 body.menu-is-open {
   overflow: hidden;
 }
@@ -209,11 +165,8 @@ body.menu-is-open {
   outline-offset: 3px;
 }
 
-/* The lime ring measures 10.39:1 against the dark surface and 1.87:1 against a
-   white card -- under the 3:1 a focus indicator has to make against what it
-   sits on, so the one place the page puts focusable text on light is the one
-   place the ring stops working. Exactly item 15's problem with the kicker, and
-   the same token answers it: --color-green-ink is 4.66:1 there. */
+/* The lime ring is 1.87:1 on the white cards, below the 3:1 a focus indicator
+   needs; the dark green ink is 4.66:1. */
 .section-projects :focus-visible {
   outline-color: var(--color-green-ink);
 }
@@ -221,23 +174,15 @@ body.menu-is-open {
 /* -----------------------------------------------------------------------------
  Header
 ----------------------------------------------------------------------------- */
-/* Solid, not translucent. This carried `rgb(12 14 16 / 90%)` and a 12px
-   backdrop-filter for a while (item 12). The blur looked right over the hero
-   and over the project screenshots, but the page still has a full-width light
-   band, and parking on Contact puts all of that band behind the bar -- so the
-   header arrived at the last section as a grey slab. Raising the alpha only
-   traded one problem for another: at 96% the composite is #151719, near enough
-   to the surface, but the blur is then invisible and the filter is machinery
-   doing nothing. Solid is the honest version of that. The scroll-triggered
-   rule below is the half of item 12 that was actually working, and it stays. */
+/* Solid rather than translucent: over the light Projects band a translucent bar
+   turns into a grey slab. */
 #header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 1030;
   background: var(--color-surface);
-  /* Always 1px, so the header keeps occupying exactly --header-offset whether
-     the rule is visible or not. Only the colour changes on scroll -- animating
-     the width would shift every anchor landing by a pixel. */
+  /* Always 1px, so the header's height never changes; only the colour appears on
+   scroll. */
   border-bottom: 1px solid transparent;
   font-family: var(--font-body);
   font-weight: 700;
@@ -245,9 +190,7 @@ body.menu-is-open {
   transition: border-color .2s;
 }
 
-/* At the top of the page the hero runs under the bar and a rule would cut it
-   in half for no reason; once anything is scrolling past, the rule is what
-   separates the two. */
+/* No rule at the top of the page, where it would cut across the hero. */
 #header.is-scrolled {
   border-bottom-color: #1e2225;
 }
@@ -260,9 +203,8 @@ body.menu-is-open {
   gap: var(--space-6);
 }
 
-/* No colour here on purpose: `#header a` carries an id, so it would outrank
-   `.navbar li.active a` and leave the active item white-on-white. Colour is
-   set on the lower-specificity rules below. */
+/* No colour here: the id makes this outrank `.navbar li.active a` and would
+   override the active item's colour. */
 #header a {
   text-decoration: none;
   text-transform: uppercase;
@@ -281,8 +223,7 @@ body.menu-is-open {
   border-radius: 50%;
 }
 
-/* Off the spacing scale on purpose: this is optical kerning between the two
-   halves of the wordmark, not layout. */
+/* Optical spacing between the two halves of the wordmark, not layout. */
 .highlight {
   padding-left: 2px;
   color: var(--color-light-green);
@@ -315,17 +256,8 @@ body.menu-is-open {
   transition: color .2s;
 }
 
-/* Scoped to .nav-menu-item, not to every `a` in the navbar: the social icons
-   are in here too, and a rule inset 10px inside their 44px box rendered as a
-   24px dash floating under a 20px glyph, underlining nothing.
-
-   Both states are carried by the rule under the word, never by recolouring the
-   label. At the 72% the header first used, lime text over the light band fell
-   to 3.83:1 -- passing as large text at 20px bold, and only just -- which is
-   what put the colour on the rule. At 90% it would be 7.17:1 and would pass
-   outright, so that argument no longer forces the choice; the rule keeps it
-   because the bar is translucent either way, and this leaves the label's
-   contrast independent of whatever happens to scroll behind it. */
+/* Current section and hover are marked by a rule under the word rather than by
+   recolouring it. Text items only: the icon links use a filled hover instead. */
 .navbar .nav-menu-item::after {
   content: "";
   position: absolute;
@@ -336,16 +268,11 @@ body.menu-is-open {
   transition: background-color .2s;
 }
 
-/* There was no hover rule on the nav at all -- the only feedback a pointer got
-   anywhere in the header was the cursor changing. */
 .navbar .nav-menu-item:hover::after {
   background: rgb(255 255 255 / 45%);
 }
 
-/* The active item used to be a solid white block with black text: heavy enough
-   to read as a pressed button rather than a location. The rule says the same
-   thing quietly, and outranks the hover rule so pointing at the current section
-   does not dim its own marker. */
+/* Outranks the hover rule, so hovering the current item keeps its marker. */
 .navbar li.active > .nav-menu-item::after,
 .navbar li.active > .nav-menu-item:hover::after {
   background: var(--color-light-green);
@@ -367,11 +294,8 @@ body.menu-is-open {
   transition: background-color .2s;
 }
 
-/* An icon button wants a filled target, not the rule the text items use: inset
-   inside a 44px box that rule came out as a 24px dash under a 20px glyph,
-   underlining nothing. The fill also shows how big the target actually is --
-   44px against a glyph less than half that. Deliberately not lime, which in
-   this header already means "the section you are on". */
+/* A filled hover shows the full 44px target. Not lime, which in the header means
+   "the section you are on". */
 .nav-menu-social a:hover {
   background: rgb(255 255 255 / 8%);
 }
@@ -411,8 +335,6 @@ body.menu-is-open {
   z-index: 999;
 }
 
-/* Ink, like everything else on the panel -- and on the scale, which this pair
-   of 8px constants had been missed by. */
 .navbar-mobile .mobile-nav-toggle {
   position: absolute;
   top: var(--space-2);
@@ -432,14 +354,7 @@ body.menu-is-open {
   line-height: 2;
 }
 
-/* Ink on lime, not white on lime. This panel is the one place the page still
-   uses the accent as a full field rather than as an accent, and white measured
-   1.87:1 on it -- under the floor even at the 40px these labels are set at.
-   Ink is 9.52:1. The icons below go with them, for the same reason.
-
-   It also left the menu with no active marker at all: `.navbar a` is already
-   white, so the white this rule used to set was a no-op and the current section
-   was indistinguishable from the other two. */
+/* Ink on lime: white measures 1.87:1 on this panel, ink 9.52:1. */
 .navbar-mobile a {
   color: var(--color-ink-strong);
 }
@@ -448,12 +363,8 @@ body.menu-is-open {
   background-color: transparent;
 }
 
-/* Lime on lime cannot show, so the marker is the same rule-under-the-word the
-   desktop header uses, in ink. It has to be repositioned to get there: the
-   shared rule sits at the bottom of the link box, which works against the
-   header's 48px row but falls 40px clear of the word once these items are set
-   at 40px on a doubled line height. Measured from the text instead, the way
-   the project-card links are. */
+/* The active marker, repositioned under the word: at 40px on a doubled line
+   height, the bottom of the link box sits well below the text. */
 .navbar-mobile .nav-menu-item::after {
   display: none;
 }
@@ -481,29 +392,16 @@ body.menu-is-open {
   padding-block: clamp(3.5rem, 8vw, 5.5rem);
 }
 
-/* The LAST section is padded out to fill the screen. Two reasons: a section
-   can only be scrolled to the top while a viewport's worth of document
-   remains below its start, and the last one has nothing after it but the
-   footer -- without this, Contact sat stranded in the lower half on tall
-   displays and the nav link appeared to do nothing. Height excludes the fixed
-   header so the section exactly fills what you see once scrolled to, and the
-   content is centred in it rather than stranded at the top above a void. */
+/* The last section fills the screen below the header, minus the footer, so it
+   can be scrolled to the top and its content sits centred when you arrive. */
 main .section:last-child {
-  /* Subtracts the same offset scroll-padding-top uses, plus the footer, so
-     that once scrolled to, the section and the footer together fill exactly
-     what the header leaves: nothing of the previous section above, nothing of
-     the document below. Without the footer term the section alone filled the
-     screen and pushed the footer just past the fold. */
   min-height: calc(100vh - var(--header-offset) - var(--footer-height));
   min-height: calc(100dvh - var(--header-offset) - var(--footer-height));
   display: flex;
   align-items: center;
 }
 
-/* A kicker over each H2. The headings used to open their sections with nothing
-   above them, so they read as labels rather than as the start of something.
-   Shares the hero eyebrow's proportions deliberately -- same role, same voice --
-   with a short rule to anchor it. */
+/* A kicker over each H2, sharing the hero eyebrow's proportions. */
 .section-kicker {
   display: flex;
   align-items: center;
@@ -531,30 +429,14 @@ main .section:last-child {
   font-weight: 700;
   font-size: clamp(1.9rem, 4.5vw, 2.85rem);
   line-height: 1.12;
-  /* Uppercase always needs opening up -- the caps were drawn to sit beside
-     lowercase, and lose their rhythm when set solid against each other. */
+  /* Caps need opening up when set against each other. */
   letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--color-white);
 }
 
-/* Body copy stays body-sized. This rule previously carried a clamp up to
-   1.5rem, which -- being one specificity step above .project-desc and friends
-   -- silently overrode every size set on them and rendered plain sentences at
-   24px. Only .lead is meant to be larger, and it says so itself.
-
-   It carried `margin: 0 0 .75em` for just as long, and that was the same bug
-   wearing a different hat. At (0,1,1) the selector outranks every single-class
-   paragraph rule in the sheet, and it was silently overriding eight of them:
-   .eyebrow and .project-meta/-desc/-links asked for `margin: 0` and got .75em,
-   .section-kicker and .contact-status-kicker asked for a --space value and got
-   .75em, and .hero-cta and .contact-actions asked for a margin-top that never
-   arrived at all. So the rhythm item 34 put on a 4px grid was not the rhythm
-   that rendered. The UA default is cleared by the bare `p` rule in the base
-   now, at a specificity that loses to a class the way it should. */
 .section p {
-  /* Roughly 62 characters. Past ~75 the eye loses the line it is returning
-     to; the Contact copy was running the full 1140px. */
+  /* Roughly 62 characters: past ~75 the eye loses its place between lines. */
   max-width: 62ch;
 }
 
@@ -576,17 +458,15 @@ main .section:last-child {
   display: flex;
   align-items: center;
   padding-top: calc(var(--header-height) + var(--space-7));
-  /* Plain JPEG by default; the @supports block below upgrades browsers that
-     can pick a modern codec. Written this way round so a browser without
-     image-set() still gets a background rather than none at all. */
+  /* Plain JPEG by default; the @supports block below upgrades browsers that can
+     pick a modern codec, so a browser without image-set() still gets a background. */
   background-image: var(--hero-scrim), url('/images/intro_background.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-/* AVIF is 24 KB against the JPEG's 96 KB at slightly better fidelity
-   (42.4 dB PSNR vs 41.2 for WebP), so it is offered first. */
+/* AVIF is 20 KB against the JPEG's 96 KB, so it is offered first. */
 @supports (background-image: image-set(url("/images/intro_background.avif") type("image/avif"))) {
   .section-intro {
     background-image: var(--hero-scrim), image-set(
@@ -597,9 +477,7 @@ main .section:last-child {
   }
 }
 
-/* Two columns from the desktop breakpoint. The hero used to be a single
-   left-aligned block on a full-bleed photograph whose right 60% carried
-   nothing, so the composition read as text floating in a void. */
+/* Copy and terminal side by side from the desktop breakpoint. */
 .hero {
   display: grid;
   align-items: center;
@@ -612,21 +490,16 @@ main .section:last-child {
   }
 }
 
-/* Stacked under the copy, the card keeps the width of an actual terminal.
-   Left to fill the column it stretched to ~850px on a tablet, marooning its
-   short monospaced lines against a wide empty right edge. */
+/* Stacked under the copy, the terminal keeps a terminal's width instead of
+   stretching across a tablet. */
 @media (max-width: 991px) {
   .hero-terminal {
     max-width: 34rem;
   }
 }
 
-/* The hero's rhythm is set here and nowhere else. It used to be this gap plus
-   whatever .section p added on top, which rendered 22.8 / 12 / 27.6 / 27.6px
-   between the five blocks -- an order nobody chose, off the grid, and with the
-   eyebrow sitting further from the heading it labels than that heading sat from
-   the copy. Chosen now, and on the scale: 16px into the heading, 20px between
-   the two sentences, 32px before the call to action. */
+/* The hero's vertical rhythm: 16px into the heading, 20px between the two
+   sentences, 32px before the call to action. */
 .hero-copy {
   display: flex;
   flex-direction: column;
@@ -649,8 +522,7 @@ main .section:last-child {
 .hero-terminal {
   border: 1px solid rgb(255 255 255 / 11%);
   border-radius: 12px;
-  /* Translucent so the photograph behind it stays part of the composition
-     instead of being punched out by an opaque rectangle. */
+  /* Translucent, so the photograph stays part of the composition. */
   background: rgb(10 12 14 / 86%);
   box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
   overflow: hidden;
@@ -710,8 +582,7 @@ main .section:last-child {
   font-size: clamp(.78rem, .95vw, .875rem);
   line-height: 1.8;
   color: var(--color-almost-white);
-  /* A terminal does not reflow. Narrow viewports scroll the card instead of
-     wrapping its lines into nonsense. */
+  /* A terminal does not reflow: narrow viewports scroll the card instead. */
   overflow-x: auto;
 }
 
@@ -738,8 +609,8 @@ main .section:last-child {
   }
 }
 
-/* The global reduced-motion rule collapses animation-duration to .01ms, which
-   would turn a blink into a strobe. Stop it outright instead. */
+/* The global reduced-motion rule would turn the blink into a strobe; stop it
+   outright instead. */
 @media (prefers-reduced-motion: reduce) {
   .terminal-cursor {
     animation: none;
@@ -762,8 +633,8 @@ h1 {
   font-weight: 700;
   font-size: clamp(2.35rem, 5.5vw, 4.25rem);
   line-height: 1.06;
-  /* Negative tracking suits a grotesk, not this. Orbitron's sidebearings are
-     part of the design; tightening them just makes the letters touch. */
+  /* No negative tracking: Orbitron's sidebearings are part of the design, and
+   tightening them makes the letters touch. */
   letter-spacing: 0;
   color: var(--color-white);
   text-wrap: balance;
@@ -774,19 +645,8 @@ h1 {
   text-wrap: pretty;
 }
 
-/* Violet is reserved for the creative, after-hours thread of the site -- the
-   same role, and the same token, the hero terminal gives this exact phrase. A
-   solid value keeps item 7's promise of one accent better than the gradient it
-   replaced, which needed a second and third colour to say it.
-
-   The selector has to name `strong`. This is a `<strong class=...>` inside
-   `.lead`, and `.lead strong` (0,1,1) already sets the lime; a bare
-   `.night-begins-to-shine` (0,1,0) loses to it, so the phrase rendered in the
-   same lime as the ordinary `<strong>` in the sentence above and the line lost
-   its point entirely. The gradient this replaced never hit that, because
-   `background-clip`/`-webkit-text-fill-color` are properties nothing else in
-   the cascade sets -- swapping it for `color` moved the rule into a contest it
-   was not written to win. */
+/* Violet marks the after-hours thread, as in the terminal. The selector names
+   `strong` to outrank `.lead strong`, which would otherwise make it lime. */
 strong.night-begins-to-shine {
   color: var(--color-violet);
 }
@@ -822,10 +682,6 @@ strong.night-begins-to-shine {
   }
 }
 
-/* The 24px step is what the card rendered all along -- a 12px gap plus the
-   ~12px .section p was adding to every paragraph in it. With the paragraph
-   margins gone the gap carries it on its own, which also puts the title the
-   same distance below the media panel as the card's own side padding. */
 .project-card {
   display: flex;
   flex-direction: column;
@@ -834,39 +690,29 @@ strong.night-begins-to-shine {
   background: var(--color-white);
   border: 1px solid var(--color-hairline);
   border-top: 3px solid var(--color-light-green);
-  /* Rounding the card means rounding the media panel with it: the panel uses
-     negative margins to meet the card's edges, and overflow clips it to the
-     padding box, so it picks up the corners for free. */
+  /* overflow: hidden clips the media panel, which meets the card's edges through
+     negative margins, to the rounded corners. */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgb(12 14 16 / 5%);
 }
 
-/* A consistent media panel per card. The three screenshots have wildly
-   different shapes -- 1:1 pixel art, a 0.71:1 portrait app, a 2.53:1 terminal
-   -- so they are contained rather than cropped, on a dark panel that bleeds to
-   the card edges. Cropping to a common ratio would reduce the portrait to a
-   sliver and cut text off the terminal. */
+/* One dark panel per card. The screenshots have very different shapes (square
+   pixel art, a portrait app, a wide terminal), so they are contained, not
+   cropped. */
 .project-media {
   /* Negative margins cancel the card's padding so the panel meets its edges. */
   margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) 0;
-  /* Matting, and the point of it. The three screenshots are 1:1 pixel art, a
-     0.71:1 portrait and a 2.53:1 terminal, so `contain` left each a different
-     amount of bare panel: bansoko bled to the edges, t0d0 sat in wide pillarbox
-     bars, and zecret -- which happens to be exactly 16:10 -- filled the frame
-     completely. The panels therefore read as three different treatments rather
-     than one. Insetting all three by the same 16px makes the mount deliberate:
-     every screenshot now sits ON the panel instead of one of them being it. */
+  /* An even 16px mat, so every screenshot sits on the panel the same way whatever
+     its shape. */
   padding: var(--space-4);
   aspect-ratio: 16 / 10;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* A soft top-down light over a per-project tint, so the mount reads as a lit
-     surface rather than a flat hole cut in the card. Every tint is near-black
-     and simply follows the dominant hue of the screenshot it holds -- these are
-     surfaces, not a reopening of item 7's accent count. */
+  /* A soft top-down light over a near-black tint that follows each screenshot's
+     dominant hue. */
   background:
     linear-gradient(to bottom, rgb(255 255 255 / 5%), rgb(255 255 255 / 0%) 60%),
     var(--project-tint, var(--color-surface-raised));
@@ -905,10 +751,8 @@ strong.night-begins-to-shine {
   --project-tint: #191720;
 }
 
-/* `display: contents` dissolves the <picture> box so the <img> becomes the
-   flex item directly. Without it the picture is the flex item, the image is
-   only bounded relative to that auto-height box, and a tall screenshot
-   overflows the panel and gets clipped instead of fitting. */
+/* Makes the <img> the flex item directly, so max-height bounds it by the panel
+   rather than by the picture's auto-height box. */
 .project-media picture {
   display: contents;
 }
@@ -920,8 +764,6 @@ strong.night-begins-to-shine {
   width: auto;
   height: auto;
   object-fit: contain;
-  /* Small enough to read as a mounted screenshot rather than as a rounded
-     component in its own right -- the card is already at 12px. */
   border-radius: 4px;
 }
 
@@ -994,10 +836,8 @@ strong.night-begins-to-shine {
   font-size: .95rem;
 }
 
-/* The two links are peers -- a repository and a place to try the thing -- so
-   they are styled alike and told apart by their icon. They used to differ by
-   colour alone (ink vs green), which read as a hierarchy that was never
-   intended. */
+/* The two links are peers (code and a place to try it): styled alike, told apart
+   by their icon. */
 .project-links a {
   position: relative;
   display: inline-flex;
@@ -1010,12 +850,8 @@ strong.night-begins-to-shine {
   transition: color .2s;
 }
 
-/* Drawn against the text rather than against the box. This was a border-bottom,
-   which sits at the bottom edge of the 44px touch target and so floated 14.2px
-   clear of the word -- a detached dash under the link rather than an underline
-   on it. The target is worth keeping at 44px, so the rule came off the box
-   instead: half the line box down, plus .75em, lands just under the descenders
-   and stays there at whatever size the link is set. */
+/* Underline drawn against the text, not the 44px box: half the line box down
+   plus .75em lands just under the descenders. */
 .project-links a::after {
   content: "";
   position: absolute;
@@ -1047,51 +883,17 @@ strong.night-begins-to-shine {
 /* -----------------------------------------------------------------------------
  Contact
 ----------------------------------------------------------------------------- */
-/* A night sky, under a scrim, in three layers: scrim, a neutral wash of
-   light, starfield.
+/* A night sky under a scrim: a generated starfield
+   (scripts/make-contact-starfield.mjs) with a neutral wash of light, in the
+   hero's tones. The hero says "when the night begins to shine", and this is the
+   section that names both halves of that.
 
-   The subject is not decoration picked at random. The hero says "...and when the
-   night begins to shine I become a solo game developer", and this is the one
-   section that names both halves of that -- Work and After hours, in the "At a
-   glance" list beside this copy.
-
-   Its tones are the hero's, so the page opens and closes on the same
-   near-black: the scrim is the hero scrim's rgb(11 13 15), the base is a
-   neutral grey rather than the blue-cast --color-surface-raised, and the light
-   from the top right is white rather than tinted, the way the photograph's
-   light is. It used to carry a violet wash and a lime one, which made it read
-   as a different site from the greyscale hero.
-
-   What it replaces is a 14 kB raster of a stock dark polygonal abstract whose
-   own faint accent was olive-gold -- a fourth colour on a page that had just
-   finished reducing itself to two. That file had also been 856 kB, with a 2.1 MB
-   @2x handed to every retina laptop by an image-set() density descriptor.
-
-   The starfield is generated, not exported: scripts/make-contact-starfield.mjs,
-   deterministic from a seed, 9.4 kB of SVG that gzips to 2.0 kB. Being vector it
-   cannot reacquire the @2x problem, and its density and palette are inputs
-   rather than pixels. No raster companion, and nothing to re-export.
-
-   Every text colour over it is measured against the REAL composited background
-   -- the text hidden, the section screenshotted, the pixels behind each glyph
-   sampled from a canvas rather than assumed flat -- because this is exactly the
-   case item 9 was about. Worst figures, over 1440 / 1280 / 390px:
+   Text contrast was measured against the composited background (text hidden,
+   pixels under each glyph sampled, worst 5x5 mean) at 1440 / 1280 / 390px:
 
      lead 18.0:1   dd 18.0:1   kicker 10.0:1   dt 5.9:1   footer 10.3:1
 
-   against a 4.5:1 floor (3:1 for h2 and the lead, which are large). dt is the
-   tightest by some way -- it is --color-grey at 12px, the smallest and faintest
-   thing on the page -- and it is the one to re-measure if this artwork is ever
-   retuned.
-
-   Two notes on method, both learned here. Measure the rects the TEXT occupies
-   (Range.getClientRects) and not the element box: dt is a block in a 495px grid
-   column and its box runs on for 430px of empty space past the word "WORK", so
-   sampling the box reported artwork in the far right of the section as though it
-   were behind a glyph, and produced a spurious 2.81:1. And average over a small
-   neighbourhood rather than taking the single worst pixel: a starfield's worst
-   pixel is a star, and a 1px dot under a 12px glyph is not what the eye
-   integrates. The figures above are the worst 5x5 window mean. */
+   dt is the tightest; re-measure it if this artwork changes. */
 .section-contact {
   background-color: #16181a;
   background-image:
@@ -1105,8 +907,8 @@ strong.night-begins-to-shine {
 
 .section-contact .lead {
   margin-bottom: 1.5em;
-  /* Narrower than the 62ch body measure and balanced, or the sentence runs the
-     full column and drops a two-character orphan onto the second line. */
+  /* Narrower than the body measure and balanced, so it does not leave a short
+     orphan on the second line. */
   max-width: 34ch;
   font-size: clamp(1.35rem, 2.6vw, 1.85rem);
   text-wrap: balance;
@@ -1169,12 +971,7 @@ strong.night-begins-to-shine {
 /* -----------------------------------------------------------------------------
  Buttons
 ----------------------------------------------------------------------------- */
-/* One fill, one radius, icon inline on a gap. These used to be split two-tone
-   controls -- a darker icon block butted against a lighter label block -- which
-   is a 2015 flat-design pattern, and on the email button it meant a grey slab
-   that read as disabled (item 25) even though its label was passing contrast
-   the whole time. There is no lift on hover: hover movement was tried on the
-   project cards and rejected, so the feedback here is colour only. */
+/* Colour-only hover feedback: no lift or movement anywhere on the page. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -1190,8 +987,6 @@ strong.night-begins-to-shine {
   transition: background-color .2s, border-color .2s, color .2s;
 }
 
-/* One primary per view -- the hero's "see my projects", and the email action,
-   which is the thing this section exists for. */
 .button-primary {
   background: var(--color-light-green);
   color: var(--color-ink-strong);
@@ -1205,12 +1000,8 @@ strong.night-begins-to-shine {
   margin: var(--space-7) 0 0;
 }
 
-/* Centred, not stretched. .icon-button carries an explicit 44px height so it
-   cannot stretch to match, and the default `normal` alignment left it hanging
-   from the top of a taller row: 10.8px short at desktop, and 39.6px at 320px
-   where the button's label wraps to two lines. */
-/* Sized to the address rather than stretched: a wide green bar with the text
-   at its left edge reads as an input field, not a button. */
+/* Sized to the address rather than stretched to the column, where it read as an
+   input field. Centred so the 44px copy button lines up with it. */
 .email-controls {
   display: flex;
   align-items: center;
@@ -1270,9 +1061,6 @@ strong.night-begins-to-shine {
 }
 
 @media (max-width: 991px) {
-  /* No background override here any more. The old one nudged the focal point of
-     a photographic texture that had a subject to keep in frame; a starfield has
-     none, and `cover` on a vector has no edge to show at any size. */
   .contact-status {
     padding: var(--space-6) 0 0;
     border-top: 1px solid rgb(255 255 255 / 14%);
@@ -1303,15 +1091,10 @@ strong.night-begins-to-shine {
 
 /* -----------------------------------------------------------------------------
  Motion
- The page had none at all. This is the whole of it: a short fade up as a block
- first enters the viewport, once.
+ A short fade up as a block first enters the viewport, once.
 ----------------------------------------------------------------------------- */
-/* .has-reveal is set on <html> by app.js, and only after it has established
-   that the visitor has not asked for reduced motion. Hiding these blocks from
-   the stylesheet alone would leave them invisible for good if the JS bundle
-   never arrived -- a missing animation is a far cheaper failure than a missing
-   page, so the hidden state is not allowed to exist without the code that
-   undoes it. */
+/* Hidden only once app.js has added .has-reveal to <html>, so the content stays
+   visible if the script never runs. */
 .has-reveal .reveal {
   opacity: 0;
   transform: translateY(12px);
@@ -1330,9 +1113,8 @@ strong.night-begins-to-shine {
 /* -----------------------------------------------------------------------------
  Footer
 ----------------------------------------------------------------------------- */
-/* Deliberately NOT given `min-height: var(--footer-height)`. The footer takes
-   its natural height and the token follows it, rather than the other way round;
-   pinning the box to the token would make the measurement circular. */
+/* Natural height, which app.js measures into --footer-height; a min-height from
+   the token would make that circular. */
 #footer {
   background: var(--color-surface);
   border-top: 1px solid rgb(255 255 255 / 7%);
@@ -1345,9 +1127,6 @@ strong.night-begins-to-shine {
   margin: 0;
   text-align: center;
   font-size: 1rem;
-  /* Was #6a6f72 -- 3.80:1 on the dark surface, under the 4.5:1 floor. The muted
-     grey is a token already, so the fix costs one fewer magic hex rather than
-     one more. It measures 6.22:1 here; the 5.75:1 this comment used to quote
-     was the token's old #8c8c8c value and went stale when it was retuned. */
+  /* 6.22:1 on the dark surface. */
   color: var(--color-grey);
 }

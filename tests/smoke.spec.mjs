@@ -347,12 +347,9 @@ test('reduced motion never hides anything behind an animation',
 
 test('paragraph spacing is the spacing the stylesheet asks for', async ({ page }) => {
   await page.goto('/');
-  // `.section p` used to carry `margin: 0 0 .75em`. At (0,1,1) that outranks
-  // every single-class paragraph rule in the sheet, so eight of them were
-  // silently overridden and the page rendered a rhythm nobody had chosen --
-  // visible to nobody, and off the 4px grid item 34 had just put it on. The
-  // margin now lives on a bare `p` rule, which loses to a class the way it
-  // should. These are the values those class rules actually ask for.
+  // A paragraph margin on a more specific selector (it used to be `.section p`)
+  // silently overrides every single-class rule's margin. These are the values
+  // those class rules ask for.
   const intended = {
     '.eyebrow': ['marginBottom', '0px'],
     '.section-kicker': ['marginBottom', '12px'],

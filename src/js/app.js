@@ -75,12 +75,9 @@ copyEmailButton.addEventListener('click', async () => {
 const navbar = select('#navbar')
 const toggle = select('.mobile-nav-toggle')
 
-// Everything the open menu covers. The overlay hides these from the pointer,
-// but not from the keyboard: tabbing past the last link in the menu walked
-// straight out into the page underneath, where the focus ring is invisible
-// behind an opaque lime panel. `inert` takes the subtrees out of the tab order
-// and out of the accessibility tree for exactly as long as the menu is up.
-// The toggle itself is inside .navbar, so it stays reachable.
+// Everything the open menu covers. `inert` keeps keyboard focus from walking out
+// of the menu into the page hidden behind it. The toggle is inside .navbar, so
+// it stays reachable.
 const behindMenu = [select('#main'), select('#footer'), select('.logo')]
 
 function setMobileMenu(open) {
@@ -89,8 +86,7 @@ function setMobileMenu(open) {
   select('.mobile-nav-toggle .icon', true)
     .forEach((icon, index) => icon.classList.toggle('hidden', index === (open ? 0 : 1)))
   for (const part of behindMenu) part.toggleAttribute('inert', open)
-  // Without this the page scrolls behind the overlay, so closing the menu
-  // returns you somewhere other than where you opened it.
+  // Stops the page scrolling behind the overlay.
   document.body.classList.toggle('menu-is-open', open)
 }
 
@@ -98,9 +94,7 @@ toggle.addEventListener('click', () => {
   setMobileMenu(!navbar.classList.contains('navbar-mobile'))
 })
 
-// A full-screen overlay that only closes by pointing at the right control is a
-// trap for keyboard users; Escape is the expected way out, and focus belongs
-// back on the button that opened it.
+// Escape closes the menu and returns focus to the button that opened it.
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && navbar.classList.contains('navbar-mobile')) {
     setMobileMenu(false)
@@ -110,9 +104,8 @@ document.addEventListener('keydown', (event) => {
 
 /* -----------------------------------------------------------------------------
  Scroll spy
- Marks the section currently in view as active in the header menu. Replaces
- fullPage.js's onLeave/afterRender callbacks; scrolling itself is now the
- browser's, driven by the anchors in the markup.
+ Marks the section currently in view as active in the header menu. Scrolling
+ itself is the browser's, driven by the anchors in the markup.
 ----------------------------------------------------------------------------- */
 const sections = select('main .section', true)
 const navLinks = select('#nav-menu a.nav-menu-item', true)
@@ -129,12 +122,10 @@ function setActiveSection(id) {
   }
 }
 
-// The active section is whichever one covers a band just below the header.
-// Measured directly rather than via IntersectionObserver: an observer only
-// fires when an element CROSSES a threshold, so once two sections both overlap
-// the band it stops reporting, and the stored figures go stale mid-scroll --
-// which left the previous section highlighted after navigating. Reading the
-// rects on each frame is a few microseconds and is always correct.
+// The active section is whichever one covers most of a band just below the
+// header. Measured on each frame rather than with an IntersectionObserver,
+// which only reports threshold crossings and goes stale when two sections both
+// overlap the band.
 const BAND_TOP = 0.10
 const BAND_BOTTOM = 0.20
 
@@ -165,12 +156,10 @@ function updateActiveSection() {
 
 /* -----------------------------------------------------------------------------
  Footer height
- The last section is sized to leave exactly enough room for the footer, so that
- arriving at Contact puts the footer's bottom edge on the viewport's. That means
- the stylesheet needs the footer's real height, which no constant can predict --
- it changes with the viewport, with where the colophon wraps, and once more when
- the webfont loads. Measured and published instead. The CSS carries fallback
- values for the no-JS case.
+ The last section leaves exactly enough room for the footer, so arriving at
+ Contact puts the footer's bottom edge on the viewport's. The footer's height
+ changes with the viewport and when the webfont loads, so it is measured and
+ published as --footer-height. The CSS carries a fallback for the no-JS case.
 ----------------------------------------------------------------------------- */
 const footer = select('#footer')
 
@@ -180,8 +169,7 @@ function publishFooterHeight() {
 
 publishFooterHeight()
 
-// Catches viewport changes, reflow when the colophon rewraps, and the reflow
-// after the webfont swaps in -- all of which a one-shot measurement misses.
+// Catches viewport changes and the reflow after the webfont swaps in.
 if ('ResizeObserver' in window) {
   new ResizeObserver(publishFooterHeight).observe(footer)
 }
@@ -216,16 +204,10 @@ select('#nav-menu a.nav-menu-item', true)
 
 /* -----------------------------------------------------------------------------
  Reveal on scroll
- The page had no motion of any kind. This is the restrained version: a short
- fade up as a block enters the viewport, once, and never again.
-
- The hidden state is applied from HERE rather than from the stylesheet -- app.js
- adds .has-reveal to <html> before marking anything. A stylesheet that hid these
- blocks on its own would leave them permanently invisible if the bundle failed
- to load, which trades a missing animation for a missing page.
-
- The hero is deliberately not in the list: it is above the fold, so it would
- only ever be seen fading in over its own first paint.
+ A short fade up as a block enters the viewport, once. The hidden state is
+ applied from here (via .has-reveal on <html>) rather than by the stylesheet,
+ so the content stays visible if this script never runs. The hero is left out:
+ it is above the fold and would only fade in over its own first paint.
 ----------------------------------------------------------------------------- */
 const REVEALED = [
   '.section-projects .section-kicker',
@@ -237,11 +219,7 @@ const REVEALED = [
   '.contact-status'
 ].join(', ')
 
-// Read once at load. The global reduced-motion rule in the stylesheet collapses
-// transition-duration to .01ms, which would technically do the job -- but not
-// adding the class at all means the elements are never hidden in the first
-// place, so there is no window in which a mis-fired observer could leave one
-// blank.
+// With reduced motion the elements are never hidden in the first place.
 if ('IntersectionObserver' in window &&
     !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const targets = select(REVEALED, true)
@@ -251,10 +229,7 @@ if ('IntersectionObserver' in window &&
 
     for (const el of targets) el.classList.add('reveal')
 
-    // Only the cards stagger, and only against their own row. Indexing every
-    // target instead would hand the Contact block a delay measured from the top
-    // of the Projects section, so it would still be fading in well after it had
-    // finished arriving.
+    // Only the cards stagger, against each other.
     select('.project-card', true)
       .forEach((card, i) => card.style.setProperty('--reveal-index', i))
 
@@ -262,8 +237,7 @@ if ('IntersectionObserver' in window &&
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
         entry.target.classList.add('is-revealed')
-        // One-way: nothing re-hides on the way back up, and each element stops
-        // being watched the moment it has played.
+        // One-way: nothing re-hides on the way back up.
         observer.unobserve(entry.target)
       }
     }, { rootMargin: '0px 0px -8% 0px' })

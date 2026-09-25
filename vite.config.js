@@ -46,7 +46,32 @@ if (rawEmail) {
   }
 }
 
+// Preloads the body font so it is fetched alongside the stylesheet rather than
+// after it, and is usually in before first paint -- otherwise the text reflows
+// when it swaps in. Build only: the file name is fingerprinted, and in dev the
+// stylesheet's own @font-face is fast enough.
+function preloadBodyFont() {
+  return {
+    name: 'preload-body-font',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, { bundle }) {
+        const font = Object.keys(bundle ?? {})
+          .find((file) => /roboto-condensed-latin-wght-normal-[\w-]+\.woff2$/.test(file))
+        if (!font) return html
+        return [{
+          tag: 'link',
+          attrs: { rel: 'preload', href: `/${font}`, as: 'font', type: 'font/woff2', crossorigin: true },
+          injectTo: 'head'
+        }]
+      }
+    }
+  }
+}
+
 export default defineConfig({
+  plugins: [preloadBodyFont()],
   // Sources live in src/, but the config and .env stay at the project root.
   root: 'src',
   envDir: '..',
@@ -63,6 +88,14 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    // Two pages. 404.html is built rather than copied from public/ so that it
+    // can use the same fingerprinted font files as the home page.
+    rollupOptions: {
+      input: {
+        index: 'src/index.html',
+        404: 'src/404.html'
+      }
+    },
     // Without this, esbuild "minifies" `@media (max-width: 991px)` into Level 4
     // range syntax (`@media (width <= 991px)`), which browsers older than
     // Chrome 104 / Firefox 102 / Safari 16.4 drop wholesale -- taking the
