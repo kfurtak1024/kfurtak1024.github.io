@@ -811,9 +811,15 @@ strong.night-begins-to-shine {
   padding: 0;
   list-style: none;
   display: grid;
-  /* auto-fit means the column count follows the viewport with no breakpoints. */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: var(--space-5);
+}
+
+/* One column, then all three in a row. Never two: with three cards a two-column
+   grid always leaves the last one alone on its row. */
+@media (min-width: 992px) {
+  .project-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* The 24px step is what the card rendered all along -- a 12px gap plus the
@@ -864,6 +870,25 @@ strong.night-begins-to-shine {
   background:
     linear-gradient(to bottom, rgb(255 255 255 / 5%), rgb(255 255 255 / 0%) 60%),
     var(--project-tint, var(--color-surface-raised));
+}
+
+/* Stacked one per row on a tablet, a 16:10 panel across the full width would be
+   taller than the rest of the card put together. Side by side instead: the
+   panel takes the left column and the text runs down the right. */
+@media (min-width: 640px) and (max-width: 991px) {
+  .project-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto auto;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  .project-media {
+    grid-row: 1 / -1;
+    margin: calc(var(--space-6) * -1) 0 calc(var(--space-6) * -1) calc(var(--space-6) * -1);
+    aspect-ratio: auto;
+    min-height: 14rem;
+  }
 }
 
 /* Deep space indigo, under the starfield the pixel art is set against. */
@@ -923,11 +948,7 @@ strong.night-begins-to-shine {
   color: var(--color-ink-strong);
 }
 
-/* Every card carries a year, so the head row has the same shape on all three.
-   Before this, only bansoko had anything to the right of its title and the
-   other two titles sat alone against empty space. The star count rides in the
-   same cluster, and stays bansoko's alone: t0d0 and zecret have none, and
-   printing "0" twice would advertise the absence rather than the presence. */
+/* Every card carries a year, so the head row has the same shape on all three. */
 .project-meta {
   display: flex;
   align-items: center;
@@ -936,12 +957,6 @@ strong.night-begins-to-shine {
   font-size: .95rem;
   color: var(--color-ink-soft);
   font-variant-numeric: tabular-nums;
-}
-
-.project-stars {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
 }
 
 .project-desc {
