@@ -73,6 +73,8 @@ async function copyEmailAddress(value) {
   return copied
 }
 
+let copyResetTimer
+
 copyEmailButton.addEventListener('click', async () => {
   if (!email) return
 
@@ -81,10 +83,14 @@ copyEmailButton.addEventListener('click', async () => {
     select('.check-icon').classList.remove('hidden')
     copyEmailButton.setAttribute('aria-label', 'Email address copied')
     emailCopyStatus.textContent = 'Email address copied to clipboard.'
-    window.setTimeout(() => {
+    window.clearTimeout(copyResetTimer)
+    copyResetTimer = window.setTimeout(() => {
       select('.copy-icon').classList.remove('hidden')
       select('.check-icon').classList.add('hidden')
       copyEmailButton.setAttribute('aria-label', 'Copy email address')
+      // A live region only announces a change, so leaving the text in place
+      // would make every later copy silent to a screen reader.
+      emailCopyStatus.textContent = ''
     }, 2000)
   } else {
     emailCopyStatus.textContent = 'Could not copy the email address.'
@@ -116,6 +122,13 @@ toggle.addEventListener('click', () => {
   setMobileMenu(!navbar.classList.contains('navbar-mobile'))
 })
 
+// The toggle is hidden from the desktop breakpoint up, so a menu left open while
+// the window widens (a tablet rotating, a resized window) would have no way to
+// close it. Close it as the breakpoint is crossed.
+window.matchMedia('(min-width: 992px)').addEventListener('change', (event) => {
+  if (event.matches) setMobileMenu(false)
+})
+
 // Escape closes the menu and returns focus to the button that opened it.
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && navbar.classList.contains('navbar-mobile')) {
@@ -144,18 +157,21 @@ function setActiveSection(id) {
   }
 }
 
-// The active section is whichever one covers most of a band just below the
-// header. Measured on each frame rather than with an IntersectionObserver,
-// which only reports threshold crossings and goes stale when two sections both
-// overlap the band.
-const BAND_TOP = 0.10
-const BAND_BOTTOM = 0.20
+// The active section is whichever one covers most of a band starting at the
+// header's bottom edge and running a tenth of the visible area down. Measured
+// from the header rather than from the top of the viewport: on a short screen
+// a band at a fixed percentage sits partly behind the 60px header, where the
+// section you just scrolled away from is still counted. Measured on each frame
+// rather than with an IntersectionObserver, which only reports threshold
+// crossings and goes stale when two sections both overlap the band.
+const BAND_DEPTH = 0.10
+const siteHeader = select('#header')
 
 function updateActiveSection() {
   if (!sections.length) return
 
-  const top = window.innerHeight * BAND_TOP
-  const bottom = window.innerHeight * BAND_BOTTOM
+  const top = siteHeader.getBoundingClientRect().bottom
+  const bottom = top + Math.max(1, (window.innerHeight - top) * BAND_DEPTH)
 
   let winner = null
   let mostCovered = 0

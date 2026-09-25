@@ -210,22 +210,22 @@ body.menu-is-open {
   text-transform: uppercase;
 }
 
+/* No flex gap: it would also separate the two halves of the wordmark, which are
+   set as one word and told apart by colour alone. */
 .logo {
   color: var(--color-white);
   display: flex;
   align-items: center;
-  gap: var(--space-2);
   line-height: 1;
   letter-spacing: -1px;
 }
 
 .logo img {
+  margin-right: var(--space-2);
   border-radius: 50%;
 }
 
-/* Optical spacing between the two halves of the wordmark, not layout. */
 .highlight {
-  padding-left: 2px;
   color: var(--color-light-green);
 }
 
@@ -324,22 +324,25 @@ body.menu-is-open {
   }
 }
 
-/* Full-screen mobile menu */
+/* The mobile menu drops down from the header and speaks its language: the same
+   dark surface, white labels and a lime rule under the current section. It
+   starts below the header, so the wordmark stays in view, and the toggle is
+   pinned to the exact spot it occupies in the header row. */
 .navbar-mobile {
   position: fixed;
-  inset: 0;
+  inset: calc(var(--header-height) + 1px) 0 0;
   flex-direction: column;
   overflow: hidden;
-  background-color: var(--color-light-green);
-  font-size: 40px;
+  background-color: var(--color-surface);
+  border-top: 1px solid #1e2225;
+  font-size: 2rem;
   z-index: 999;
 }
 
 .navbar-mobile .mobile-nav-toggle {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  color: var(--color-ink-strong);
+  position: fixed;
+  top: calc((var(--header-height) - 44px) / 2);
+  right: 1.5rem;
 }
 
 .navbar-mobile > ul {
@@ -354,15 +357,6 @@ body.menu-is-open {
   line-height: 2;
 }
 
-/* Ink on lime: white measures 1.87:1 on this panel, ink 9.52:1. */
-.navbar-mobile a {
-  color: var(--color-ink-strong);
-}
-
-.navbar-mobile li.active {
-  background-color: transparent;
-}
-
 /* The active marker, repositioned under the word: at 40px on a doubled line
    height, the bottom of the link box sits well below the text. */
 .navbar-mobile .nav-menu-item::after {
@@ -373,11 +367,6 @@ body.menu-is-open {
   display: block;
   top: calc(50% + .62em);
   bottom: auto;
-  background: var(--color-ink-strong);
-}
-
-.navbar-mobile .nav-menu-social a:hover {
-  background: rgb(20 24 28 / 8%);
 }
 
 .navbar-mobile .nav-menu-social {
@@ -1149,6 +1138,14 @@ strong.night-begins-to-shine {
   /* Only the project cards set an index; everything else falls back to 0 and
      plays immediately. */
   transition-delay: calc(var(--reveal-index, 0) * 80ms);
+}
+
+/* Print everything, whether or not it has been scrolled into view yet. */
+@media print {
+  .has-reveal .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* -----------------------------------------------------------------------------

@@ -402,6 +402,25 @@ test('copyright year is filled in', async ({ page }) => {
     .toHaveText(String(new Date().getFullYear()));
 });
 
+test('the active nav item is right on a short landscape screen', async ({ page }) => {
+  // A band at a fixed percentage of the viewport sits partly behind the 60px
+  // header when the screen is this short, and kept the previous section marked.
+  await page.setViewportSize({ width: 740, height: 340 });
+  await page.goto('/');
+  await page.locator('.mobile-nav-toggle').click();
+  await page.locator('#nav-menu a.nav-menu-item').nth(1).click();
+  await expect(page.locator('#nav-menu li').nth(1)).toHaveClass(/active/);
+  await expect(page.locator('#nav-menu li.active')).toHaveCount(1);
+});
+
+test('printing shows content that has not been scrolled into view', async ({ page }) => {
+  await page.goto('/');
+  await page.emulateMedia({ media: 'print' });
+  const opacities = await page.locator('.project-card, .contact-card')
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
+  expect(opacities).toEqual(opacities.map(() => '1'));
+});
+
 test.describe('mobile menu', () => {
   test.skip(({ isMobile }) => !isMobile, 'hamburger only exists on narrow viewports');
 
@@ -448,15 +467,11 @@ test.describe('mobile menu', () => {
     }
   });
 
-  test('labels are readable on the lime panel, and the active one is marked',
+  test('labels are readable on the menu panel, and the active one is marked',
     async ({ page }) => {
       await page.goto('/');
       await page.locator('.mobile-nav-toggle').click();
 
-      // The panel is the one place the accent is a full field rather than an
-      // accent, and the labels were white on it -- 1.87:1, under the floor even
-      // at 40px. The same white was also what `li.active` set, so the active
-      // marker was a no-op and the current section looked like the other two.
       const menu = await page.evaluate(() => {
         const item = (sel) => document.querySelector(sel);
         const active = item('.navbar-mobile li.active > .nav-menu-item');
@@ -475,6 +490,21 @@ test.describe('mobile menu', () => {
       expect(menu.activeRule).not.toBe('none');
       expect(menu.otherRule).toBe('none');
     });
+
+  test('closes when the window widens past the breakpoint', async ({ page }) => {
+    await page.goto('/');
+    const navbar = page.locator('#navbar');
+    await page.locator('.mobile-nav-toggle').click();
+    await expect(navbar).toHaveClass(/navbar-mobile/);
+
+    // At desktop width the toggle is hidden, so an overlay left open would have
+    // no close button and would keep the page behind it inert.
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await expect(navbar).not.toHaveClass(/navbar-mobile/);
+    await expect(page.locator('#main')).not.toHaveAttribute('inert', '');
+    expect(await page.evaluate(() =>
+      getComputedStyle(document.body).overflow)).not.toBe('hidden');
+  });
 
   test('closes on Escape and returns focus to the toggle', async ({ page }) => {
     await page.goto('/');
