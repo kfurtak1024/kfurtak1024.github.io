@@ -886,10 +886,10 @@ strong.night-begins-to-shine {
    to shine".
 
    Text contrast was measured against the composited background (text hidden,
-   pixels under each glyph sampled, worst 5x5 mean) at 1440 / 1280 / 390px,
-   before the business card replaced the "At a glance" list:
+   pixels under each glyph sampled, worst 5x5 mean); worst over 1440 / 1280 /
+   390px:
 
-     lead 18.0:1   kicker 10.0:1   footer 10.3:1
+     h2 18.8:1   lead 17.1:1   kicker 10.1:1   footer 6.2:1
 
    The business card carries its own near-opaque background, so its text does
    not depend on the artwork. */

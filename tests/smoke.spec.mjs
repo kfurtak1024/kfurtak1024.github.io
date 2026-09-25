@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 const SECTIONS = ['#section-intro', '#section-projects', '#section-contact'];
 
@@ -261,6 +262,89 @@ test('email is available as a direct mailto action and can be copied', async ({ 
   await copyButton.click();
   await expect(page.locator('#email-copy-status'))
     .toHaveText('Email address copied to clipboard.');
+});
+
+test('a second copy is announced too, not just the first', async ({ page }) => {
+  // A polite live region only announces a change. The message has to be
+  // cleared once the checkmark resets, or every later copy is silent.
+  await page.clock.install();
+  await page.goto('/');
+  const copyButton = page.locator('#copy-email');
+  const status = page.locator('#email-copy-status');
+
+  await copyButton.click();
+  await expect(status).toHaveText('Email address copied to clipboard.');
+  await page.clock.runFor(2500);
+  await expect(status).toHaveText('');
+
+  await copyButton.click();
+  await expect(status).toHaveText('Email address copied to clipboard.');
+});
+
+test('the business card links every way to reach him and saves as a vCard',
+  async ({ page }) => {
+    await page.goto('/');
+    const card = page.locator('.contact-card');
+    const email = (await page.locator('#card-email-text').textContent()).trim();
+    expect(email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+    await expect(page.locator('#card-email')).toHaveAttribute('href', `mailto:${email}`);
+    await expect(card.locator('a[href="https://www.linkedin.com/in/krzysztoffurtak"]'))
+      .toHaveCount(1);
+    await expect(card.locator('a[href="https://github.com/kfurtak1024"]')).toHaveCount(1);
+
+    // The vCard is built in the browser, so check what actually downloads.
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('#save-contact').click()
+    ]);
+    expect(download.suggestedFilename()).toBe('krzysztof-furtak.vcf');
+    const vcard = await readFile(await download.path(), 'utf8');
+    expect(vcard).toMatch(/^BEGIN:VCARD\r\n/);
+    expect(vcard).toContain('FN:Krzysztof Furtak');
+    expect(vcard).toContain(`EMAIL;TYPE=INTERNET:${email}`);
+    expect(vcard).toMatch(/END:VCARD\r\n$/);
+  });
+
+test('the project cards never leave one alone on a row', async ({ page }) => {
+  // offsetTop/offsetLeft ignore the reveal animation's transform, which would
+  // otherwise shift cards that have not faded in yet.
+  const layout = () => page.locator('.project-card').evaluateAll((cards) =>
+    cards.map((card) => {
+      const media = card.querySelector('.project-media');
+      const head = card.querySelector('.project-head');
+      return {
+        top: card.offsetTop,
+        mediaBesideText: head.offsetLeft >= media.offsetLeft + media.offsetWidth - 1
+      };
+    }));
+
+  for (const [width, oneRow, sideBySide] of [
+    [390, false, false], [768, false, true], [1024, true, false], [1440, true, false]
+  ]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const cards = await layout();
+    const rows = new Set(cards.map((c) => c.top)).size;
+    expect(rows, `rows at ${width}px`).toBe(oneRow ? 1 : 3);
+    for (const c of cards) {
+      expect(c.mediaBesideText, `screenshot beside text at ${width}px`).toBe(sideBySide);
+    }
+  }
+});
+
+test('the 404 page renders in the site fonts and links home', async ({ page, baseURL }) => {
+  // Built as a second Vite entry, so a broken input or asset path would only
+  // show up here.
+  const errors = watchForErrors(page, baseURL);
+  await page.goto('/404.html');
+  await page.waitForLoadState('networkidle');
+  const loaded = await page.evaluate(async () => {
+    await document.fonts.ready;
+    return [...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family);
+  });
+  expect(loaded).toEqual(expect.arrayContaining(['Orbitron Variable', 'Roboto Condensed Variable']));
+  await expect(page.locator('a[href="/"]')).toHaveCount(1);
+  expect(errors).toEqual([]);
 });
 
 test('the footer sits at the very end of the page', async ({ page }) => {
