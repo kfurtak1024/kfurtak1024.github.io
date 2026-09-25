@@ -55,7 +55,6 @@ jobs:
         run: npm run build
         env:
           VITE_SITE_EMAIL_BASE64: ${{ secrets.MY_EMAIL_BASE64 }}
-          VITE_FULLPAGE_LICENSE_KEY: ${{ secrets.MY_SECRET }}
 
       # Without this, a PR that built on .env dev fallbacks goes green while the
       # eventual push to main fails at --require-secrets. Warn where it is seen.
@@ -92,8 +91,7 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox
 
-      # The licence key is already baked into dist/ by the build step, so it is
-      # not needed here. Strictness comes from EXPECT_REAL_SECRETS (job env).
+      # Runs against the dist/ built above, so it needs no secrets of its own.
       - name: Smoke test 🧪
         run: npm test
 

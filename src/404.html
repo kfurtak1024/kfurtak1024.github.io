@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Page not found — Krzysztof Furtak</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#0b0d0f">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <!-- Built by Vite as a second entry (see vite.config.js), so it shares the
+         site's hashed, self-hosted fonts. Absolute paths throughout: GitHub
+         Pages serves this file for a missing URL at any depth. -->
+    <link rel="stylesheet" href="/css/fonts.css">
+    <style>
+      /* Copies of the tokens in src/css/main.css -- keep them in step. */
+      :root {
+        color-scheme: dark;
+        --surface: #0b0d0f;
+        --ink-strong: #14181c;
+        --light-green: #9acd4a;
+        --green-dark: #84b43d;
+        --body: #b7bec2;
+      }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        color: var(--body);
+        font-family: "Roboto Condensed Variable", "Roboto Condensed", system-ui, sans-serif;
+        text-align: center;
+        padding: 1.5rem;
+      }
+      main { max-width: 32rem; }
+      h1 {
+        font-family: "Orbitron Variable", "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: clamp(4rem, 18vw, 8rem);
+        line-height: 1;
+        margin: 0;
+        color: var(--light-green);
+      }
+      p { font-size: 1.15rem; margin: 1rem 0 2rem; }
+      /* The site's primary button (.button.button-primary in main.css). */
+      a {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        background: var(--light-green);
+        color: var(--ink-strong);
+        font-size: 1.125rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color .2s;
+      }
+      a:hover { background: var(--green-dark); }
+      a:focus-visible { outline: 2px solid var(--light-green); outline-offset: 3px; }
+      @media (prefers-reduced-motion: reduce) {
+        a { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>404</h1>
+      <p>That page does not exist.</p>
+      <a href="/">Back to the home page</a>
+    </main>
+  </body>
+</html>
