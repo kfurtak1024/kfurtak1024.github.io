@@ -233,10 +233,10 @@ bansoko/  t0d0/  zecret/
 
       <section id="section-contact" class="section section-contact">
         <div class="container">
-          <p class="section-kicker">02 &mdash; Get in touch</p>
-          <h2>Contact</h2>
           <div class="contact-layout">
             <div class="contact-primary">
+              <p class="section-kicker">02 &mdash; Get in touch</p>
+              <h2>Contact</h2>
               <p class="lead">Have a question, an opportunity, or want to say hello? Reach out.</p>
               <p class="contact-actions">
                 <span class="email-controls">
@@ -246,6 +246,30 @@ bansoko/  t0d0/  zecret/
                     </svg>
                     <span id="email">Email me</span>
                   </a>
+                </span>
+              </p>
+              <span id="email-copy-status" class="sr-only" aria-live="polite"></span>
+            </div>
+
+            <aside class="contact-card" aria-label="Business card">
+              <div class="contact-card-head">
+                <picture>
+                  <source srcset="/images/portrait.avif" type="image/avif">
+                  <img class="contact-card-photo" src="/images/portrait.webp" width="88" height="88" alt="Krzysztof Furtak">
+                </picture>
+                <div>
+                  <p class="contact-card-name">Krzysztof Furtak</p>
+                  <p class="contact-card-role">Software engineer</p>
+                </div>
+              </div>
+              <ul class="contact-card-links">
+                <li id="card-email-row" class="contact-card-email hidden">
+                  <a id="card-email" href="#section-contact">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                      <use href="#email-icon"/>
+                    </svg>
+                    <span id="card-email-text">Email</span>
+                  </a>
                   <button id="copy-email" type="button" class="icon-button hidden" aria-label="Copy email address" title="Copy email address">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon copy-icon">
                       <use href="#copy-icon"/>
@@ -254,37 +278,30 @@ bansoko/  t0d0/  zecret/
                       <use href="#check-icon"/>
                     </svg>
                   </button>
-                </span>
-              </p>
-              <nav class="contact-socials" aria-label="Professional profiles">
-                <a href="https://www.linkedin.com/in/krzysztoffurtak" target="_blank" rel="noopener noreferrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
-                    <use href="#linkedin-icon"/>
-                  </svg>
-                  LinkedIn
-                </a>
-                <a href="https://github.com/kfurtak1024" target="_blank" rel="noopener noreferrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
-                    <use href="#github-icon"/>
-                  </svg>
-                  GitHub
-                </a>
-              </nav>
-              <span id="email-copy-status" class="sr-only" aria-live="polite"></span>
-            </div>
-
-            <aside class="contact-status" aria-label="At a glance">
-              <p class="contact-status-kicker">At a glance</p>
-              <dl>
-                <div>
-                  <dt>Work</dt>
-                  <dd>Java enterprise applications</dd>
-                </div>
-                <div>
-                  <dt>After hours</dt>
-                  <dd>Indie games and developer tools</dd>
-                </div>
-              </dl>
+                </li>
+                <li>
+                  <a href="https://www.linkedin.com/in/krzysztoffurtak" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
+                      <use href="#linkedin-icon"/>
+                    </svg>
+                    <span>linkedin.com/in/krzysztoffurtak</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/kfurtak1024" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon">
+                      <use href="#github-icon"/>
+                    </svg>
+                    <span>github.com/kfurtak1024</span>
+                  </a>
+                </li>
+              </ul>
+              <a id="save-contact" class="button button-secondary hidden" download="krzysztof-furtak.vcf" href="#section-contact">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                  <use href="#download-icon"/>
+                </svg>
+                Save contact
+              </a>
             </aside>
           </div>
         </div>
@@ -321,6 +338,9 @@ bansoko/  t0d0/  zecret/
       </symbol>
       <symbol id="external-link-icon" viewBox="0 0 512 512">
         <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/>
+      </symbol>
+      <symbol id="download-icon" viewBox="0 0 512 512">
+        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v242.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
       </symbol>
       <symbol id="arrow-down-icon" viewBox="0 0 384 512">
         <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>

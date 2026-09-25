@@ -24,9 +24,31 @@ const copyEmailButton = select('#copy-email')
 const emailCopyStatus = select('#email-copy-status')
 
 if (email) {
-  select('#email').textContent = email
   emailLink.href = `mailto:${email}`
   copyEmailButton.classList.remove('hidden')
+
+  select('#card-email-text').textContent = email
+  select('#card-email').href = `mailto:${email}`
+  select('#card-email-row').classList.remove('hidden')
+
+  // The vCard is built here rather than shipped as a file, so the address
+  // stays out of the page source like everywhere else.
+  const vcard = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'N:Furtak;Krzysztof;;;',
+    'FN:Krzysztof Furtak',
+    'TITLE:Software Engineer',
+    `EMAIL;TYPE=INTERNET:${email}`,
+    'URL:https://krzysztoffurtak.dev',
+    'X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/krzysztoffurtak',
+    'X-SOCIALPROFILE;TYPE=github:https://github.com/kfurtak1024',
+    'END:VCARD',
+    ''
+  ].join('\r\n')
+  const saveContact = select('#save-contact')
+  saveContact.href = URL.createObjectURL(new Blob([vcard], { type: 'text/vcard' }))
+  saveContact.classList.remove('hidden')
 }
 
 async function copyEmailAddress(value) {
@@ -213,10 +235,8 @@ const REVEALED = [
   '.section-projects .section-kicker',
   '.section-projects h2',
   '.project-card',
-  '.section-contact .section-kicker',
-  '.section-contact h2',
   '.contact-primary',
-  '.contact-status'
+  '.contact-card'
 ].join(', ')
 
 // With reduced motion the elements are never hidden in the first place.

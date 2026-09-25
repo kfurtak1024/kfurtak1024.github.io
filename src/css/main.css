@@ -889,11 +889,13 @@ strong.night-begins-to-shine {
    section that names both halves of that.
 
    Text contrast was measured against the composited background (text hidden,
-   pixels under each glyph sampled, worst 5x5 mean) at 1440 / 1280 / 390px:
+   pixels under each glyph sampled, worst 5x5 mean) at 1440 / 1280 / 390px,
+   before the business card replaced the "At a glance" list:
 
-     lead 18.0:1   dd 18.0:1   kicker 10.0:1   dt 5.9:1   footer 10.3:1
+     lead 18.0:1   kicker 10.0:1   footer 10.3:1
 
-   dt is the tightest; re-measure it if this artwork changes. */
+   The business card carries its own near-opaque background, so its text does
+   not depend on the artwork. */
 .section-contact {
   background-color: #16181a;
   background-image:
@@ -915,57 +917,121 @@ strong.night-begins-to-shine {
   color: var(--color-white);
 }
 
+/* The hero's columns and gap, so the business card comes out the same size as
+   the hero terminal and the two panels frame the page alike. */
 .contact-layout {
   display: grid;
   align-items: center;
-  gap: var(--space-8);
+  gap: clamp(2.5rem, 5vw, 4rem);
 }
 
 @media (min-width: 992px) {
   .contact-layout {
-    grid-template-columns: minmax(0, 1.1fr) minmax(16rem, .9fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
   }
 }
 
-.contact-status {
-  padding: var(--space-6) 0 var(--space-6) var(--space-7);
-  border-left: 1px solid rgb(255 255 255 / 14%);
+/* A business card: who, and every way to reach him, in one place. Built like the
+   hero terminal -- translucent, bordered, shadowed -- so the page opens and
+   closes on the same kind of object. */
+.contact-card {
+  padding: var(--space-6);
+  border: 1px solid rgb(255 255 255 / 11%);
+  border-radius: 12px;
+  background: rgb(10 12 14 / 86%);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
 }
 
-.contact-status-kicker {
-  margin: 0 0 var(--space-4);
-  font-family: var(--font-display);
-  font-size: .8rem;
-  font-weight: 500;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--color-light-green);
+@supports (backdrop-filter: blur(1px)) {
+  .contact-card {
+    background: rgb(10 12 14 / 72%);
+    backdrop-filter: blur(8px);
+  }
 }
 
-.contact-status dl {
-  display: grid;
-  gap: var(--space-5);
-  margin: 0;
+/* Stacked, it keeps the hero terminal's width too. */
+@media (max-width: 991px) {
+  .contact-card {
+    max-width: 34rem;
+  }
 }
 
-.contact-status dl div {
-  display: grid;
-  gap: var(--space-1);
+.contact-card-email {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.contact-status dt {
-  font-family: var(--font-display);
-  font-size: .72rem;
-  font-weight: 500;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+.contact-card-email a {
+  min-width: 0;
+}
+
+/* Borderless inside the card: it sits at the end of the row it copies, and a
+   boxed button there would outweigh the address itself. */
+.contact-card .icon-button {
+  flex: none;
+  border-color: transparent;
   color: var(--color-grey);
 }
 
-.contact-status dd {
-  margin: 0;
-  font-size: 1.15rem;
+.contact-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+}
+
+.contact-card-photo {
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 12%);
+  object-fit: cover;
+}
+
+.contact-card-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: 1.2;
   color: var(--color-white);
+}
+
+.contact-card-role {
+  margin-top: var(--space-1);
+  color: var(--color-grey);
+}
+
+.contact-card-links {
+  margin: var(--space-4) 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.contact-card-links a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  color: var(--color-body);
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.contact-card-links span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.contact-card-links .icon {
+  flex: none;
+  color: var(--color-grey);
+  transition: color .2s;
+}
+
+.contact-card-links a:hover,
+.contact-card-links a:hover .icon {
+  color: var(--color-light-green);
 }
 
 /* -----------------------------------------------------------------------------
@@ -996,12 +1062,25 @@ strong.night-begins-to-shine {
   background: var(--color-green-dark);
 }
 
+/* A quieter button: the weight and grey of the card's link rows, so it reads as
+   one more way to reach him rather than a second call to action. */
+.button-secondary {
+  border-color: rgb(255 255 255 / 18%);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-body);
+}
+
+.button-secondary:hover {
+  border-color: var(--color-light-green);
+  color: var(--color-light-green);
+}
+
 .contact-actions {
   margin: var(--space-7) 0 0;
 }
 
-/* Sized to the address rather than stretched to the column, where it read as an
-   input field. Centred so the 44px copy button lines up with it. */
+/* Sized to its label rather than stretched to the column. */
 .email-controls {
   display: flex;
   align-items: center;
@@ -1039,35 +1118,6 @@ strong.night-begins-to-shine {
   color: var(--color-light-green);
 }
 
-.contact-socials {
-  display: flex;
-  gap: var(--space-5);
-  margin-top: var(--space-4);
-}
-
-.contact-socials a {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-body);
-  font-weight: 700;
-  text-decoration: none;
-  transition: color .2s;
-}
-
-.contact-socials a:hover {
-  color: var(--color-light-green);
-}
-
-@media (max-width: 991px) {
-  .contact-status {
-    padding: var(--space-6) 0 0;
-    border-top: 1px solid rgb(255 255 255 / 14%);
-    border-left: 0;
-  }
-}
-
 @media (max-width: 560px) {
   .email-controls {
     width: 100%;
@@ -1078,15 +1128,6 @@ strong.night-begins-to-shine {
     justify-content: center;
   }
 
-  .contact-socials {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
-  }
-
-  .contact-socials a {
-    justify-content: center;
-  }
 }
 
 /* -----------------------------------------------------------------------------

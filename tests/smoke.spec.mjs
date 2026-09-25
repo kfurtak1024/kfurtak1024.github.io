@@ -231,7 +231,7 @@ test('every project card shows a screenshot that actually loads',
 test('email is available as a direct mailto action and can be copied', async ({ page }) => {
   await page.goto('/');
   const button = page.locator('#email-button');
-  const label = page.locator('#email');
+  const label = page.locator('#card-email-text');
   const copyButton = page.locator('#copy-email');
 
   const revealed = (await label.textContent()).trim();
@@ -353,7 +353,6 @@ test('paragraph spacing is the spacing the stylesheet asks for', async ({ page }
   const intended = {
     '.eyebrow': ['marginBottom', '0px'],
     '.section-kicker': ['marginBottom', '12px'],
-    '.contact-status-kicker': ['marginBottom', '16px'],
     '.project-meta': ['marginBottom', '0px'],
     '.project-desc': ['marginBottom', '0px'],
     '.project-links': ['marginBottom', '0px'],
