@@ -2,4 +2,6 @@
 /node_modules
 /playwright-report
 /test-results
+# Fetched from the CV repository's latest release during CI
+/public/cv.pdf
 .env.local

@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# The CV is shared by link, not surfaced in search results
+Disallow: /cv.pdf
 
 Sitemap: https://krzysztoffurtak.dev/sitemap.xml
