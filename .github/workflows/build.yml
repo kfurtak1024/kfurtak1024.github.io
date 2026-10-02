@@ -29,7 +29,9 @@ jobs:
       # secrets", derived from the event rather than from the secrets
       # themselves. Both the verify guard and the licence-nag assertion read it,
       # so they cannot drift apart -- and cannot quietly relax themselves.
-      EXPECT_REAL_SECRETS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      # workflow_dispatch counts too: the CV repository's release triggers a
+      # manual run on main to redeploy with the new /cv.pdf.
+      EXPECT_REAL_SECRETS: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
       # The `secrets` context cannot be read from a step-level `if`, so surface
       # availability as a plain env value the steps below can test.
       HAS_EMAIL_SECRET: ${{ secrets.MY_EMAIL_BASE64 != '' }}
@@ -47,6 +49,30 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # The CV lives in the private kfurtak1024/cv repository. Copy the public
+      # PDF (no phone, no photo; the release's other files have them) from its
+      # latest release into public/, which Vite ships verbatim as /cv.pdf.
+      # Only runs expected to deploy are strict: a deploy without the file
+      # would 404 every link already sent out, so there a failed download
+      # fails the build, and Verify also requires the file. Everywhere else
+      # (pull requests, forks, Dependabot) a missing CV is just a warning.
+      - name: Fetch CV 📄
+        env:
+          GH_TOKEN: ${{ secrets.CV_REPO_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::CV_REPO_TOKEN was not available to this run; building without /cv.pdf."
+            exit 0
+          fi
+          if gh release download --repo kfurtak1024/cv --pattern Krzysztof_Furtak_CV_public.pdf --output public/cv.pdf --clobber; then
+            exit 0
+          fi
+          if [ "$EXPECT_REAL_SECRETS" = "true" ]; then
+            echo "::error::Could not download the CV from kfurtak1024/cv. Check that a release exists and that CV_REPO_TOKEN is valid (fine-grained tokens expire)."
+            exit 1
+          fi
+          echo "::warning::Could not download the CV (no release yet, or CV_REPO_TOKEN lacks access); building without /cv.pdf."
 
       # Secrets are passed as env vars, never interpolated into a shell
       # command, so values containing / + & " cannot corrupt the build. Where
@@ -118,8 +144,10 @@ jobs:
   deploy:
     name: Deploy 🚀
     needs: build
-    # THE guard: pull requests build and test, but only a push to main ships.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # THE guard: pull requests build and test, but only main ships -- on a
+    # push, or on a manual run (which is how a CV release redeploys the site).
+    # Keep in step with EXPECT_REAL_SECRETS above.
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
