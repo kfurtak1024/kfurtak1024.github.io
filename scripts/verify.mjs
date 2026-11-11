@@ -201,10 +201,12 @@ async function checkReferences(files) {
 }
 
 // Files that are reached by convention rather than by a reference: the entry
-// document, the 404 GitHub Pages serves by name, and the files a browser or a
-// crawler asks for at a fixed path.
+// document, the 404 GitHub Pages serves by name, the files a browser or a
+// crawler asks for at a fixed path, and the CV, which is linked from outside
+// the site (LinkedIn, email) rather than from the page itself.
 const UNREFERENCED_BY_DESIGN = new Set([
-  'index.html', '404.html', 'CNAME', 'robots.txt', 'sitemap.xml', 'favicon.ico'
+  'index.html', '404.html', 'CNAME', 'robots.txt', 'sitemap.xml', 'favicon.ico',
+  'cv.pdf'
 ]);
 
 // The mirror image of checkReferences: that one catches a reference with no
@@ -218,6 +220,20 @@ function checkOrphanAssets(files, reached) {
     const rel = relative(DIST, f).split(sep).join('/');
     if (UNREFERENCED_BY_DESIGN.has(rel) || reached.has(f)) continue;
     fail(`orphan asset: ${rel} is in the build but nothing references it`);
+  }
+}
+
+// cv.pdf is fetched from the private CV repository's latest release during the
+// CI build, which needs the CV_REPO_TOKEN secret. Local and fork builds have no
+// token, so the file is only required where real secrets are: a deploy without
+// it would silently break every link already sent out to /cv.pdf.
+async function checkCv(requireReal) {
+  if (!requireReal) return;
+  try {
+    const head = (await readFile(join(DIST, 'cv.pdf'))).subarray(0, 5).toString();
+    if (head !== '%PDF-') fail('cv.pdf is not a PDF');
+  } catch {
+    fail('missing cv.pdf in a build that requires real secrets (set CV_REPO_TOKEN)');
   }
 }
 
@@ -277,6 +293,7 @@ await checkForbiddenTokens(files);
 const { count: refCount, reached } = await checkReferences(files);
 checkOrphanAssets(files, reached);
 await checkInjectedEmail(requireReal, files);
+await checkCv(requireReal);
 
 if (errors.length) {
   console.error(`verify FAILED (${errors.length} problem(s)):`);
